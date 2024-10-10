@@ -5,10 +5,11 @@ class Book:
         self.author = author
         self.year = year
         self.genre = genre
-        self.quantity = quantity
+        self.quantity = quantity # total quantity of the book
+        self.borrowed_cur = 0 # number of books currently borrowed
 
     def __str__(self):
-        return f'{self.name}, {self.author}, {self.year}m., {self.genre}, {self.quantity}vnt.'
+        return f'{self.name}, {self.author}, {self.year}m., {self.genre}, viso: {self.quantity}vnt., paimta: {self.borrowed_cur}'
     
     def __eq__(self, other): # __eq__ defines how class instances can be compared
         if isinstance(other, Book): # is it an instance of Book class
@@ -18,16 +19,11 @@ class Book:
                     self.genre == other.genre)
                     #self.quantity == other.quantity) # do not check for quantity
         return False # if other is not a Book
-    
-    def get_quantity(self):
-        return self.quantity
-    
-    def update_quantity(self,new_quantity):
-        self.quantity = new_quantity
 
 if __name__ == "__main__":
     knyga1 = Book("Svetimas","Alberas Kamiu",1942,"romanas",12)
-    print(knyga1.get_quantity())
-    knyga1.update_quantity(24)
-    print(knyga1.get_quantity())
+    print(knyga1)
+    print(knyga1.quantity)
+    knyga1.quantity = 55
+    print(knyga1.quantity)
     # print(knyga1)
