@@ -1,9 +1,13 @@
 from books import Book
+from user import Reader, Librarian
+from datetime import datetime as dt
 
 class Library:
     def __init__(self):
         self.bookid = 0
         self.books = {} # book class instances in a dictionary
+        self.readers = {} # readers - key:lib_card, value: Reader object
+        self.lib_card_num = 0
 
     def add_book(self,name,author,year,genre,quantity):
         book = Book(name,author,year,genre,quantity)
@@ -26,19 +30,29 @@ class Library:
         except KeyError:
             print(f'Knyga su id {bookid} nerasta')
 
-        pass
-
     def all_books(self):
         for id, object in self.books.items():
             print(f'ID: {id}, Knyga: {object}')
 
     def borrow_book(self,book_id):
+        #current_date = dt.now().date() 
+        # append to user books borrowed as well
         book = self.books[book_id]
         if book.quantity > book.borrowed_cur:
             book.borrowed_cur += 1
             return True
         else:
             return False
+        
+    def add_reader(self,username):
+        self.lib_card_num += 1 # increment the library card ID number
+        lib_card = f'BIB{self.lib_card_num:05}'
+        books_borrowed = {} # dictionary where key is book ID, and value is borrowing date
+        reader = Reader(username,lib_card,books_borrowed)
+        self.readers[lib_card] = reader
+        return lib_card
+
+
 
 if __name__ == "__main__":
     lib = Library()
@@ -60,6 +74,9 @@ if __name__ == "__main__":
     # lib.remove_book(25)
     # lib.remove_book(3)
     lib.all_books()
-    
-
-  
+    for i in range (3):
+        lib.add_reader("Jonas Jonauskas")
+    lib.add_reader("Tomas")
+    print(lib.readers)
+    for item in lib.readers.values():
+        print(item)
