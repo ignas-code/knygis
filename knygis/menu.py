@@ -10,6 +10,14 @@ def book_input():
     return name,author,year,genre,quantity
 
 def reader_menu(lib):
+    lib_card = input("Įveskite skaitytojo kortelės numerį: ")
+    if lib_card in lib.readers:
+        username = lib.readers[lib_card].username
+        print(f'Sveiki prisijungę, {username} !')
+    else:
+        print("Klaidinga įvestis")
+        return
+
     while True:
         choice = input("""
 1 - Peržiūrėti knygas
@@ -31,6 +39,18 @@ q - Grįžti\n""")
                 print("Klaidinga įvestis. Bandykite dar kartą.")
 
 def librarian_menu(lib):
+    librarian = input("Įveskite bibliotekininko vartotojo vardą: ")
+    
+    if librarian == lib.librarian.username:
+        librarian_pw = input("Įveskite slaptažodį: ")
+        if librarian_pw == lib.librarian.password:
+            print(f"Sveiki prisijungę, {librarian}!")
+    else:
+        print("Neteisingai!")
+        return
+    
+    
+
     while True:
         choice = input("""
 1 - Pridėti knygą
@@ -86,6 +106,7 @@ q - Grįžti\n""")
 
 def initial_menu(lib):
     while True:
+        print("\nPasirinkite vartotoją: ")
 
         choice = input("""
 1 - Skaitytojas
@@ -95,10 +116,8 @@ Pasirinkite: """)
 
         match choice:
             case '1': # 1 - Skaitytojas
-                print("1")
                 reader_menu(lib)
-            case '2':
-                print("2") # 2 - Bibliotekininkas
+            case '2': # 2 - Bibliotekininkas
                 librarian_menu(lib)
             case 'q':
                 break

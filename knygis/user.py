@@ -20,6 +20,9 @@ class Librarian(User):
         super().__init__(username)
         self.password = password
 
+    def __str__(self):
+        return f'{self.username}, {self.password}'
+
 if __name__ == "__main__":
     reader1 = Reader("Skaitmantas",12333,[132,144])
     print(reader1)

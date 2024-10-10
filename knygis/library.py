@@ -8,6 +8,7 @@ class Library:
         self.books = {} # book class instances in a dictionary
         self.readers = {} # readers - key:lib_card, value: Reader object
         self.lib_card_num = 0
+        self.librarian = Librarian("Bibliotekininkas","Skaitau2000")
 
     def add_book(self,name,author,year,genre,quantity):
         book = Book(name,author,year,genre,quantity)
@@ -77,6 +78,7 @@ if __name__ == "__main__":
     for i in range (3):
         lib.add_reader("Jonas Jonauskas")
     lib.add_reader("Tomas")
-    print(lib.readers)
-    for item in lib.readers.values():
-        print(item)
+    for value in lib.readers.values():
+        print(value.lib_card, value.username) # value.books_borrowed
+    print(lib.librarian.username)
+    print(lib.librarian.password)
