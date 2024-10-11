@@ -12,7 +12,8 @@ def book_input():
 def reader_menu(lib):
     lib_card = input("Įveskite skaitytojo kortelės numerį: ")
     if lib_card in lib.readers:
-        username = lib.readers[lib_card].username
+        reader = lib.readers[lib_card]
+        username = reader.username
         print(f'Sveiki prisijungę, {username} !')
     else:
         print("Klaidinga įvestis")
@@ -29,7 +30,15 @@ q - Grįžti\n""")
                 lib.all_books()
 
             case '2': # 2 - Pasiimti knygą
-                print("funkcionalumas dar kuriamas")
+                try:
+                    book_id = int(input("Įveskite norimos knygos ID: "))
+                except:
+                    print("Klaidinga įvestis")
+                    return
+                print(lib.borrow_book(book_id, lib_card))
+
+                save(lib)
+
 
             case 'q':
                 print("Grįžti")
@@ -102,7 +111,6 @@ q - Grįžti\n""")
 
             case _:
                 print("Klaidinga įvestis. Bandykite dar kartą.")
-
 
 def initial_menu(lib):
     while True:
