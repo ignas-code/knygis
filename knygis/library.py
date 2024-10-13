@@ -46,6 +46,13 @@ class Library:
         except:
             print("Skaitytojas nerastas")
             return False
+        users_overdue_books = self.get_reader_overdue(lib_card)
+        if users_overdue_books:
+            print("Turite knygų negražintų laiku: ")
+            for book_id in users_overdue_books:
+                print(self.books[book_id].name,self.books[book_id].author)
+            print("Pirmiausia grąžinkite vėluojančias knygas!")
+            return False
         if book.quantity > book.borrowed_cur:
             try:
                 borrowed_before = bool(reader.books_borrowed[book_id][1]) # check if book return date is present
@@ -142,7 +149,7 @@ class Library:
             try:
                 book_year = int(book_year) # make sure the input year is of int type
             except:
-                print("Klaida `rem_ob_1`")
+                print("Klaida `view_ob_1`")
                 return False
             if book_year < criteria:
                 obsolete_books.append(self.books[book_id])
@@ -159,7 +166,8 @@ class Library:
             print(f"Knygų, kurių leidimo data senesnė nei nurodyta ({criteria}m.) nerasta")
             return False
 
-    def remove_obsolete_books(self,criteria):
+    def remove_obsolete_books(self,criteria): # does not delete book records from readers who have that book taken
+                                              # add self.deleted_books = {} and put "popped" books there 
         removed_books = []
         book_ids = list(self.books.keys()) # Cannot iterate over a dictionary, which changes its size otherwise
         for book_id in book_ids:
@@ -184,6 +192,32 @@ class Library:
         else:
             print("Nėra pašalintų knygų")
             return False
+        
+    def get_reader_overdue(self,lib_card):
+        "Returns overdue book ids of a specific reader"
+        reader = self.readers[lib_card]
+        overdue_book_ids = reader.get_overdue()
+        return overdue_book_ids
+    
+    def get_all_overdue(self):
+        all_overdue = []
+        late_readers = []
+        for lib_card in self.readers:
+            overdue_book_id_list = self.get_reader_overdue(lib_card)
+            if overdue_book_id_list != False:
+                for overdue_book_id in overdue_book_id_list:
+                    late_book = self.books[overdue_book_id]
+                    late_reader = self.readers[lib_card].username
+                    all_overdue.append(overdue_book_id)
+                    late_readers.append(lib_card)
+                    print(f'Skaitytojas: {late_reader}, knyga: {late_book}')
+        # for book_id in all_overdue:
+        #     print()
+        # for lib_card in late_readers:
+        #     print(lib_card, )
+        return all_overdue, late_readers
+
+           
 
 
 if __name__ == "__main__":
@@ -212,14 +246,14 @@ if __name__ == "__main__":
     
     # print(lib.librarian.username)
     # print(lib.librarian.password)
-    lib.borrow_book(2,"BIB00002")
-    lib.borrow_book(2,"BIB00002")
-    lib.borrow_book(2,"BIB0002")
-    lib.borrow_book(1,"BIB00002")
-    lib.borrow_book(0,"BIB00001")
-    lib.borrow_book(1,"BIB00001")
-    lib.borrow_book(2,"BIB00001")
-    lib.return_book(2,"BIB00001")
+    # lib.borrow_book(2,"BIB00002")
+    # lib.borrow_book(2,"BIB00002")
+    # lib.borrow_book(2,"BIB0002")
+    # lib.borrow_book(1,"BIB00002")
+    # lib.borrow_book(0,"BIB00001")
+    # lib.borrow_book(1,"BIB00001")
+    # lib.borrow_book(2,"BIB00001")
+    # lib.return_book(2,"BIB00001")
     
 
 
@@ -231,9 +265,21 @@ if __name__ == "__main__":
 #     print(a)
 #     print(bool(a))
 #     print(lib.readers)
-    print("nuo cia")
             # whole_str = self.books[book_id]
             # name = self.books[book_id].name
             # author = self.books[book_id].author
             # genre = self.books[book_id].genre
-    lib.find_books_by_name(1)
+    lib.find_books_by_name("ato")
+    lib.all_readers()
+    reader1 = lib.readers["BIB00001"]
+    reader1_borrowed = reader1.books_borrowed
+    # print(reader1_borrowed)
+    # for book in reader1_borrowed:
+    #         print(reader1_borrowed[book][0],reader1_borrowed[book][1])
+    # print(reader1.get_overdue())
+    # print(lib.get_reader_overdue("BIB00001"))
+    lib.borrow_book(1,"BIB00001")
+    lib.borrow_book(2,"BIB00001")
+
+
+    lib.get_all_overdue()
