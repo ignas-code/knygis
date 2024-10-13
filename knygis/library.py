@@ -25,13 +25,6 @@ class Library:
             self.books[self.bookid] = new_book # dict[key] = value
             self.bookid += 1
 
-    def _remove_book(self,bookid): #be careful, no safety checks at all
-        try:
-            removed_book = self.books.pop(bookid)
-            print(f'Knyga "{removed_book}" pašalinta')
-        except KeyError:
-            print(f'Knyga su id {bookid} nerasta')
-
     def all_books(self):
         for id, object in self.books.items():
             print(f'ID: {id}, Knyga: {object}')
@@ -96,7 +89,6 @@ class Library:
             return False
         pass
         
-        
     def add_reader(self,username):
         self.lib_card_num += 1 # increment the library card ID number
         lib_card = f'BIB{self.lib_card_num:05}'
@@ -134,6 +126,64 @@ class Library:
             print(f'Knygų su autoriumi "{book_author}" nerasta')
             return False
         return found_books
+    
+    def _remove_book(self,bookid): #be careful, no safety checks at all
+        try:
+            removed_book = self.books.pop(bookid)
+            #print(f'Knyga "{removed_book}" pašalinta')
+            return removed_book
+        except KeyError:
+            print(f'Knyga su id {bookid} nerasta')
+
+    def view_obsolete_books(self,criteria):
+        obsolete_books = []
+        for book_id in self.books:
+            book_year = self.books[book_id].year
+            try:
+                book_year = int(book_year) # make sure the input year is of int type
+            except:
+                print("Klaida `rem_ob_1`")
+                return False
+            if book_year < criteria:
+                obsolete_books.append(self.books[book_id])
+        if obsolete_books:
+            if len(obsolete_books) == 1:
+                message = "Rasta knyga: "
+            else:
+                message = "Visos rastos knygos: "
+            print(message)
+            for book in obsolete_books:
+                print(book)
+            return obsolete_books
+        else:
+            print(f"Knygų senesnių nei {criteria} nerasta")
+            return False
+
+    def remove_obsolete_books(self,criteria):
+        removed_books = []
+        book_ids = list(self.books.keys()) # Cannot iterate over a dictionary, which changes its size otherwise
+        for book_id in book_ids:
+            book_year = self.books[book_id].year
+            try:
+                book_year = int(book_year) # make sure the input year is of int type
+            except:
+                print("Klaida `rem_ob_1`")
+                return False
+            if book_year < criteria:
+                removed_book = self._remove_book(book_id)
+                removed_books.append(removed_book)
+        if removed_books:
+            if len(removed_books) == 1:
+                message = "Pašalinta knyga: "
+            else:
+                message = "Visos pašalintos knygos: "
+            print(message)
+            for book in removed_books:
+                print(book)
+            return removed_books
+        else:
+            print("Nėra pašalintų knygų")
+            return False
 
 
 if __name__ == "__main__":

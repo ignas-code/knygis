@@ -98,7 +98,7 @@ def librarian_menu(lib):
     while True:
         choice = input("""
 1 - Pridėti knygą
-2 - Pašalinti knygą
+2 - Pašalinti knygas
 3 - Peržiūrėti knygas
 4 - Pridėti skaitytoją
 5 - Peržiūrėti skaitytojus                       
@@ -117,8 +117,23 @@ q - Grįžti\n""")
                     print("Klaida 1")
                     continue
 
-            case '2': # 2 - Pašalinti knygą
-                print("funkcionalumas dar kuriamas")
+            case '2': # 2 - Pašalinti knygas
+                try:
+                    criteria = int(input("Knygos, kurių leidimo data senesnė nei nurodyta, bus pašalintos.\nĮveskite metus: "))
+                except:
+                    print("Klaidinga įvestis")
+                    continue
+                obsolete = lib.view_obsolete_books(criteria)
+                if obsolete:
+                    confirmation = input("Ar tikrai norite pašalinti?\nt - Taip\nq - Išeiti\n")
+                    match confirmation:
+                        case 't':
+                            lib.remove_obsolete_books(criteria)
+                        case 'q':
+                            print("Operacija atšaukta")               
+                else:
+                    print(f"Knygų senesnių nei {criteria} nerasta")
+                save(lib)
                 # additional checks required
                 # book_id = input("Įveskite knygos ID: ")
                 # book_id = int(book_id)
