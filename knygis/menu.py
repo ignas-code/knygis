@@ -130,9 +130,8 @@ q - Grįžti\n""")
                         case 't':
                             lib.remove_obsolete_books(criteria)
                         case 'q':
-                            print("Operacija atšaukta")               
-                else:
-                    print(f"Knygų senesnių nei {criteria} nerasta")
+                            print("Operacija atšaukta")      
+       
                 save(lib)
                 # additional checks required
                 # book_id = input("Įveskite knygos ID: ")

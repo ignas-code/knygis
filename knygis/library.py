@@ -156,7 +156,7 @@ class Library:
                 print(book)
             return obsolete_books
         else:
-            print(f"Knygų senesnių nei {criteria} nerasta")
+            print(f"Knygų, kurių leidimo data senesnė nei nurodyta ({criteria}m.) nerasta")
             return False
 
     def remove_obsolete_books(self,criteria):
