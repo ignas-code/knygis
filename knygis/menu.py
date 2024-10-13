@@ -24,7 +24,8 @@ def reader_menu(lib):
 1 - Peržiūrėti knygas
 2 - Pasiimti knygą
 3 - Grąžinti knygą
-4 - Paimtos knygos
+4 - Ieškoti knygų
+5 - Paimtos knygos
 q - Grįžti\n""")
 
         match choice:
@@ -55,7 +56,20 @@ q - Grįžti\n""")
                     return
                 save(lib)
             
-            case '4': # 4 - Paimtos knygos
+            case '4': # 4 - Ieškoti knygų
+                find_by = input("Pasirinkite:\n1. Ieškoti pagal pavadinimą\n2. Ieškoti pagal autorių\nĮveskite: ")
+                match find_by:
+                    case '1': # 1 - Ieškoti pagal pavadinimą
+                        keyword = input("Įveskite ieškomą pavadinimą: ")
+                        lib.find_books_by_name(keyword)
+                    case '2': # 2 - Ieškoti pagal autorių
+                        keyword = input("Įveskite ieškomą autorių: ")
+                        lib.find_books_by_author(keyword)
+                    case _:
+                        print("Klaidinga įvestis. Bandykite dar kartą.")
+
+
+            case '5': # 4 - Paimtos knygos
                 print(reader.view_borrowed())
 
             case 'q':
