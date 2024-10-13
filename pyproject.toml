@@ -2,7 +2,7 @@
 name = "knygis"
 version = "0.1.0"
 description = ""
-authors = ["skersas <ignaxtas@gmail.com>"]
+authors = ["ignas-t"]
 readme = "README.md"
 
 [tool.poetry.dependencies]

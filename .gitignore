@@ -163,3 +163,9 @@ cython_debug/
 
 # hidden file created by macOS
 .DS_Store
+
+# pickle files
+lib.pickle
+
+# temporary file for testing
+temp.py

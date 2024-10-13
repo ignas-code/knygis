@@ -1,6 +1,5 @@
-from library import Library
-from menu import menu
+from menu import initial_menu
+from load_save import initial_load
 
-lib = Library() # creating an instance of Library class named `lib`
-menu(lib)
-
+lib = initial_load()
+initial_menu(lib)
