@@ -104,7 +104,36 @@ class Library:
         reader = Reader(username,lib_card,books_borrowed)
         self.readers[lib_card] = reader
         return lib_card
+    
+    def find_books_by_name(self,book_name):
+        found_books = []
+        for book_id in self.books:
+            name = self.books[book_id].name
+            if book_name.lower() in name.lower():
+                found_books.append(self.books[book_id])
+        
+        if found_books:
+            for book in found_books:
+                print(book)
+        else:
+            print(f'Knygų su pavadinimu "{book_name}" nerasta')
+            return False
+        return found_books
 
+    def find_books_by_author(self,book_author):
+        found_books = []
+        for book_id in self.books:
+            author = self.books[book_id].author
+            if book_author.lower() in author.lower():
+                found_books.append(self.books[book_id])
+        
+        if found_books:
+            for book in found_books:
+                print(book)
+        else:
+            print(f'Knygų su autoriumi "{book_author}" nerasta')
+            return False
+        return found_books
 
 
 if __name__ == "__main__":
@@ -131,8 +160,8 @@ if __name__ == "__main__":
         lib.add_reader("Jonas Jonauskas")
     lib.add_reader("Tomas")
     
-    print(lib.librarian.username)
-    print(lib.librarian.password)
+    # print(lib.librarian.username)
+    # print(lib.librarian.password)
     lib.borrow_book(2,"BIB00002")
     lib.borrow_book(2,"BIB00002")
     lib.borrow_book(2,"BIB0002")
@@ -145,10 +174,16 @@ if __name__ == "__main__":
 
 
 
-    for value in lib.readers.values():
-        print(value.lib_card, value.username, value.books_borrowed) # value.books_borrowed
+#     for value in lib.readers.values():
+#         print(value.lib_card, value.username, value.books_borrowed) # value.books_borrowed
 
-    a = lib.readers['BIB00001'].books_borrowed[2][1]
-    print(a)
-    print(bool(a))
-#    print(lib.readers)
+#     a = lib.readers['BIB00001'].books_borrowed[2][1]
+#     print(a)
+#     print(bool(a))
+#     print(lib.readers)
+    print("nuo cia")
+            # whole_str = self.books[book_id]
+            # name = self.books[book_id].name
+            # author = self.books[book_id].author
+            # genre = self.books[book_id].genre
+    lib.find_books_by_name(1)
