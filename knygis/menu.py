@@ -101,7 +101,8 @@ def librarian_menu(lib):
 2 - Pašalinti knygas
 3 - Peržiūrėti knygas
 4 - Pridėti skaitytoją
-5 - Peržiūrėti skaitytojus                       
+5 - Peržiūrėti skaitytojus
+6 - Peržiūrėti vėluojančias knygas                       
 q - Grįžti\n""")
 
         match choice:
@@ -152,6 +153,9 @@ q - Grįžti\n""")
 
             case '5': # 5 - Peržiūrėti skaitytojus
                 lib.all_readers()
+
+            case '6': # 6 - Peržiūrėti vėluojančias knygas
+                lib.get_all_overdue()
 
             case 'q':
                 print("Grįžti")
