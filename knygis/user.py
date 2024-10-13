@@ -9,11 +9,11 @@ class Reader(User):
     def __init__(self,username,lib_card,books_borrowed):
         super().__init__(username)
         self.lib_card = lib_card
-        self.books_borrowed = books_borrowed
+        self.books_borrowed = books_borrowed # {bookd_id: [borrow_date, return_date]}
 
     def view_borrowed(self):
         borrowed_books_str = ", ".join(f"{key}: {value}" for key, value in self.books_borrowed.items())
-        return borrowed_books_str
+        print(borrowed_books_str)
 
     def __str__(self):
         if not self.books_borrowed:

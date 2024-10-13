@@ -23,6 +23,8 @@ def reader_menu(lib):
         choice = input("""
 1 - Peržiūrėti knygas
 2 - Pasiimti knygą
+3 - Grąžinti knygą
+4 - Paimtos knygos
 q - Grįžti\n""")
 
         match choice:
@@ -32,13 +34,29 @@ q - Grįžti\n""")
             case '2': # 2 - Pasiimti knygą
                 try:
                     book_id = int(input("Įveskite norimos knygos ID: "))
+                    try:
+                        lib.borrow_book(book_id, lib_card)
+                    except:
+                        print("Nepavyko paimti knygos")
+                    
                 except:
                     print("Klaidinga įvestis")
                     return
-                print(lib.borrow_book(book_id, lib_card))
-
                 save(lib)
 
+            case '3': # 3 - Grąžinti knygą
+                print("Paimtos knygos: ")
+                reader.view_borrowed()
+                try:
+                    book_id = int(input("Įveskite norimos knygos ID: "))
+                    lib.return_book(book_id,lib_card)
+                except:
+                    print("Klaidinga įvestis")
+                    return
+                save(lib)
+            
+            case '4': # 4 - Paimtos knygos
+                print(reader.view_borrowed())
 
             case 'q':
                 print("Grįžti")
@@ -54,6 +72,9 @@ def librarian_menu(lib):
         librarian_pw = input("Įveskite slaptažodį: ")
         if librarian_pw == lib.librarian.password:
             print(f"Sveiki prisijungę, {librarian}!")
+        else:
+            print("Neteisingai!")
+            return
     else:
         print("Neteisingai!")
         return
@@ -102,8 +123,7 @@ q - Grįžti\n""")
                     print("Skaitytojo pridėti nepavyko")
 
             case '5': # 5 - Peržiūrėti skaitytojus
-                for value in lib.readers.values():
-                    print(value.lib_card, value.username) # value.books_borrowed
+                lib.all_readers()
 
             case 'q':
                 print("Grįžti")
