@@ -268,12 +268,12 @@ def show_initialize_data():
             for reader in initial_readers:
                 lib.add_reader(reader)
             
-            names = initial_books[0]    # First sublist: book names
-            authors = initial_books[1]  # Second sublist: authors
-            years = initial_books[2]    # Third sublist: years
-            genres = initial_books[3]   # Fourth sublist: genres
-            quantities = initial_books[4]  # Fifth sublist: quantities
-            for i in range(len(names)):  # All lists have the same length
+            names = initial_books[0]   
+            authors = initial_books[1]
+            years = initial_books[2] 
+            genres = initial_books[3]
+            quantities = initial_books[4]
+            for i in range(len(names)):
                 lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])
             st.write("Duomenys inicializuoti")
             lib.initialized_data = True

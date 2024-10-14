@@ -1,6 +1,5 @@
-# knyga, privalo turėti bent, autorių pavadinimą išleidimo metus ir žanrą
 class Book:
-    def __init__(self,name,author,year,genre,quantity): #metai str, nes kartais buna metu ruozas
+    def __init__(self,name,author,year,genre,quantity):
         self.name = name
         self.author = author
         self.year = year
@@ -26,4 +25,3 @@ if __name__ == "__main__":
     print(knyga1.quantity)
     knyga1.quantity = 55
     print(knyga1.quantity)
-    # print(knyga1)
