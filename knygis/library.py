@@ -10,6 +10,7 @@ class Library:
         self.readers = {} # readers - key:lib_card, value: Reader object
         self.lib_card_num = 0
         self.librarian = Librarian(settings.librarian_username,settings.librarian_password)
+        self.initialized_data = False
 
     def add_book(self,name,author,year,genre,quantity):
         if quantity > 0: # cannot add 0 or negative of book
@@ -285,6 +286,7 @@ if __name__ == "__main__":
     # lib.borrow_book(1,"BIB00001")
     # lib.borrow_book(2,"BIB00001")
     # lib.return_book(2,"BIB00001")
+
     
 
 

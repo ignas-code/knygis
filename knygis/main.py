@@ -1,5 +1,6 @@
 import streamlit as st
 from load_save import initial_load,save
+from initial_data import initial_readers, initial_books
 
 def main(lib):
     st.title("Biblioteka")
@@ -69,7 +70,8 @@ def reader_navigation(lib):
 
 def librarian_navigation(lib):
     st.sidebar.title("Bibliotekininko navigacija")
-    page = st.sidebar.radio("Pasirinkite:", ["Pagrindinis", "Pridėti knygą", "Pašalinti knygas", "Peržiūrėti knygas", "Pridėti skaitytoją", "Peržiūrėti skaitytojus", "Vėluojančios knygos", "Atsijungti"])
+    page = st.sidebar.radio("Pasirinkite:", ["Pagrindinis", "Pridėti knygą", "Pašalinti knygas", "Peržiūrėti knygas", "Pridėti skaitytoją", "Peržiūrėti skaitytojus",
+                                             "Vėluojančios knygos", "Inicializuoti duomenis","Atsijungti"])
 
     if page == "Pagrindinis":
         show_home()
@@ -92,13 +94,16 @@ def librarian_navigation(lib):
     elif page == "Vėluojančios knygos":
         show_late_books()
 
+    elif page == "Inicializuoti duomenis":
+        show_initialize_data()
+
     elif page == "Atsijungti":
         show_log_out()
 
 def show_home():
     st.subheader("Pagrindinis")
     username = st.session_state.username
-    st.write(f"Sveiki prisijungę, {username} !")
+    st.write(f"Sveiki prisijungę, **{username}** !")
     st.write("Čia yra pradinis mūsų puslapis.")
     st.write("Pasirinkite norimą puslapį šoninėje juostoje.")
     st.write("Ateityje čia taip pat matysite populiariausias knygas.")
@@ -248,6 +253,27 @@ def show_find_books():
             results = lib.find_books_by_author(author_name)
             for book in results:
                 st.write(f'{book}')
+
+def show_initialize_data():
+    st.subheader("Inicializuoti duomenis")
+    st.write("Sukelkite iš anksto numatytus duomenis (knygas ir vartotojus)")
+    if lib.initialized_data == False:
+        if st.button("Inicializuoti"):
+            for reader in initial_readers:
+                lib.add_reader(reader)
+            
+            names = initial_books[0]    # First sublist: book names
+            authors = initial_books[1]  # Second sublist: authors
+            years = initial_books[2]    # Third sublist: years
+            genres = initial_books[3]   # Fourth sublist: genres
+            quantities = initial_books[4]  # Fifth sublist: quantities
+            for i in range(len(names)):  # All lists have the same length
+                lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])
+            st.write("Duomenys inicializuoti")
+            lib.initialized_data = True
+            save(lib)
+    else:
+        st.write("Duomenys jau inicializuoti")
             
 if __name__ == "__main__":
     lib = initial_load()
