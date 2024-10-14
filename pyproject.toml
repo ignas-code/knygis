@@ -2,11 +2,13 @@
 name = "knygis"
 version = "0.1.0"
 description = ""
-authors = ["skersas <ignaxtas@gmail.com>"]
+authors = ["ignas-t"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.12"
+streamlit = "^1.39.0"
+watchdog = "^5.0.3"
 
 
 [build-system]
