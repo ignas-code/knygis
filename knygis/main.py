@@ -244,15 +244,21 @@ def show_find_books():
         book_name = st.text_input("Įveskite knygos pavadinimą:")
         if book_name:
             results = lib.find_books_by_name(book_name)
-            for book in results:
-                st.write(f'{book}')
+            if isinstance(results, dict):
+                for book_id, book in results.items():
+                    st.write(f'ID:{book_id}, Knyga: {book.name}, Autorius: {book.author}, Metai: {book.year}, Žanras: {book.genre}')
+            else:
+                st.write(results)
             
     elif search_option == "Ieškoti pagal autorių":
         author_name = st.text_input("Įveskite autoriaus vardą:")
         if author_name:
             results = lib.find_books_by_author(author_name)
-            for book in results:
-                st.write(f'{book}')
+            if isinstance(results, dict):
+                for book_id, book in results.items():
+                    st.write(f'ID:{book_id}, Knyga: {book.name}, Autorius: {book.author}, Metai: {book.year}, Žanras: {book.genre}')
+            else:
+                st.write(results)
 
 def show_initialize_data():
     st.subheader("Inicializuoti duomenis")
