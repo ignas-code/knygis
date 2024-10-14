@@ -18,6 +18,7 @@ def main(lib):
                     reader = lib.readers[lib_card]
                     username = reader.username
                     st.session_state.logged_in = True
+                    st.session_state.lib_card = lib_card
                     st.session_state.user = 'reader' 
                     st.session_state.username = username
                     st.success(f"Sveiki prisijungę, {username} !")
@@ -32,6 +33,7 @@ def main(lib):
             if st.button("Prisijungti"):
                 if librarian_username == lib.librarian.username and librarian_password == lib.librarian.password: 
                     st.session_state.logged_in = True
+                    st.session_state.lib_card = None
                     st.session_state.user = 'librarian'
                     st.session_state.username = librarian_username
                     st.success(f"Sveiki prisijungę, {librarian_username} !")
@@ -47,18 +49,26 @@ def main(lib):
             librarian_navigation(lib)
 
 def reader_navigation(lib):
-    st.sidebar.title("Navigacija")
-    page = st.sidebar.radio("Pasirinkite:", ["Pagrindinis", "Peržiūrėti knygas", "Atsijungti"])
+    st.sidebar.title("Skaitytojo navigacija")
+    page = st.sidebar.radio("Pasirinkite:", ["Pagrindinis", "Peržiūrėti knygas", "Pasiimti knygą", "Grąžinti knygą", "Ieškoti knygų", "Paimtos knygos", "Atsijungti"])
 
     if page == "Pagrindinis":
         show_home()
     elif page == "Peržiūrėti knygas":
         show_all_books()
+    elif page == "Pasiimti knygą":
+        show_borrow_book()
+    elif page == "Grąžinti knygą":
+        show_return_book()
+    elif page == "Ieškoti knygų":
+        show_find_books()
+    elif page == "Paimtos knygos":
+        show_borrowed_by_user()
     elif page == "Atsijungti":
         show_log_out()
 
 def librarian_navigation(lib):
-    st.sidebar.title("Navigacija")
+    st.sidebar.title("Bibliotekininko navigacija")
     page = st.sidebar.radio("Pasirinkite:", ["Pagrindinis", "Pridėti knygą", "Pašalinti knygas", "Peržiūrėti knygas", "Pridėti skaitytoją", "Peržiūrėti skaitytojus", "Vėluojančios knygos", "Atsijungti"])
 
     if page == "Pagrindinis":
@@ -174,7 +184,7 @@ def show_all_readers():
         for reader in all_readers:
             st.write(reader)
     else:
-        st.write("Skaitytoju nėra")
+        st.write("Skaitytojų nėra")
 
 def show_late_books():
     st.subheader("Vėluojančios knygos")
@@ -185,6 +195,60 @@ def show_late_books():
     st.write("Vėluojantys grąžinti skaitytojai:")
     for reader in late_readers:
         st.write(reader)
+
+def show_borrow_book():
+    st.subheader("Pasiimti knygą")
+    book_id = st.number_input("Įveskite norimos knygos ID:",min_value=0,step=1)
+    try:
+        book_name = lib.books[book_id].name
+        book_author = lib.books[book_id].author
+        st.write(f'Knyga: {book_name}, Autorius: {book_author}')
+        if st.button("Pasiimti"):
+            result = lib.borrow_book(book_id, st.session_state.lib_card)
+            st.write(result)
+            save(lib)
+    except KeyError:
+        st.write("Knyga neegzistuoja")
+        
+def show_borrowed_by_user():
+    st.subheader("Paimtos knygos")
+    borrowed_books = lib.get_borrowed_by_user(st.session_state.lib_card)
+    for item in borrowed_books:
+        st.write(item)
+
+def show_return_book():
+    st.subheader("Grąžinti knygą")
+    
+    borrowed_books_dict = lib.get_currently_borrowed_by_user(st.session_state.lib_card) # Returns a list of tuples (book_title, book_id)
+
+    if borrowed_books_dict:
+        book_options = [(title, book_id) for book_id, title in borrowed_books_dict.items()]
+        selected_book_title, selected_book_id = st.selectbox("Pasirinkite norimą grąžinti knygą:", book_options, format_func=lambda x: x[0])  # Lambda to only display the title
+        if st.button("Grąžinti"):
+                response = lib.return_book(selected_book_id,st.session_state.lib_card)
+                st.write(response)
+                save(lib)
+    else:
+        st.write("Šiuo metu neturite paėmę knygų")
+
+def show_find_books():
+    st.subheader("Ieškoti knygų")
+    search_option = st.radio("Pasirinkite paieškos tipą:", ("Ieškoti pagal pavadinimą", "Ieškoti pagal autorių"))
+
+    if search_option == "Ieškoti pagal pavadinimą":
+        book_name = st.text_input("Įveskite knygos pavadinimą:")
+        if book_name:
+            results = lib.find_books_by_name(book_name)
+            for book in results:
+                st.write(f'{book}')
+            
+    elif search_option == "Ieškoti pagal autorių":
+        author_name = st.text_input("Įveskite autoriaus vardą:")
+        if author_name:
+            st.write(f"Paieška knygoms pagal autorių: {author_name}")
+            # Replace the following with your book search logic
+            # books_found = search_books_by_author(author_name)
+            # Display the results here
 
 
 if __name__ == "__main__":

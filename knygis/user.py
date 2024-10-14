@@ -17,6 +17,7 @@ class Reader(User):
     def view_borrowed(self):
         borrowed_books_str = ", ".join(f"{key}: {value}" for key, value in self.books_borrowed.items())
         print(borrowed_books_str)
+        return self.books_borrowed
 
     def get_overdue(self):
         "Returns overdue books as a list, otherwise returns `False`"
@@ -30,8 +31,8 @@ class Reader(User):
             #print(date_taken, date_returned)
             if not date_returned: # if there is no `date_returned` - book is not returned
                 date_taken = dt.strptime(date_taken, "%Y-%m-%d").date()
-                dev_taken_date_change = timedelta(days=15) # TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY! 
-                date_taken = date_taken-dev_taken_date_change
+                #dev_taken_date_change = timedelta(days=15) # TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY!  TEST ONLY! 
+                #date_taken = date_taken-dev_taken_date_change
                 difference = (current_date - date_taken).days
                 # print("book still not returned")
                 # print(f'Book taken at {date_taken}. Current date: {current_date} Difference: {difference}')

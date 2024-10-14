@@ -46,19 +46,19 @@ class Library:
             book = self.books[book_id]
         except:
             print("Knyga nerasta")
-            return False
+            return "Knyga nerasta"
         try:
             reader = self.readers[lib_card]
         except:
             print("Skaitytojas nerastas")
-            return False
+            return "Skaitytojas nerastas"
         users_overdue_books = self.get_reader_overdue(lib_card)
         if users_overdue_books:
             print("Turite knygų negražintų laiku: ")
             for book_id in users_overdue_books:
                 print(self.books[book_id].name,self.books[book_id].author)
             print("Pirmiausia grąžinkite vėluojančias knygas!")
-            return False
+            return "Pirmiausia grąžinkite vėluojančias knygas!"
         if book.quantity > book.borrowed_cur:
             try:
                 borrowed_before = bool(reader.books_borrowed[book_id][1]) # check if book return date is present
@@ -70,13 +70,13 @@ class Library:
                 # stores borrowed book_id as key and current date as value
                 # append to user books borrowed as well
                 print(f'Knyga "{book.name}" sėkmingai paimta ({current_date})')
-                return True
+                return f'Knyga "{book.name}" sėkmingai paimta ({current_date})'
             else:
                 print("Knyga jau paimta")
-                return False
+                return "Knyga jau paimta"
         else:
             print("Nepakankamas likutis")
-            return False
+            return "Nepakankamas likutis"
     
     def return_book(self,book_id,lib_card):
         return_date = dt.now().date().strftime("%Y-%m-%d")
@@ -84,23 +84,22 @@ class Library:
             book = self.books[book_id]
         except:
             print("Knyga nerasta")
-            return False
+            return "Knyga nerasta"
         try:
             reader = self.readers[lib_card]
         except:
             print("Skaitytojas nerastas")
-            return False
+            return "Skaitytojas nerastas"
         if book_id in reader.books_borrowed:
             reader.books_borrowed[book_id][1] = return_date # {bookd_id: [borrow_date, return_date]}
             book.borrowed_cur -= 1
             # stores borrowed book_id as key and current date as value
             # append to user books borrowed as well
             print(f'Knyga "{book.name}" sėkmingai grąžinta ({return_date})')
-            return True
+            return f'Knyga "{book.name}" sėkmingai grąžinta ({return_date})'
         else:
-            print("Klaida")
-            return False
-        pass
+            print(f"Tokios knygos skaitytojas {reader.username} nebuvo paėmęs")
+            return f"Tokios knygos skaitytojas **'{reader.username}'** nebuvo paėmęs"
         
     def add_reader(self,username):
         self.lib_card_num += 1 # increment the library card ID number
@@ -122,7 +121,7 @@ class Library:
                 print(book)
         else:
             print(f'Knygų su pavadinimu "{book_name}" nerasta')
-            return False
+            return [f'Knygų su pavadinimu "{book_name}" nerasta']
         return found_books
 
     def find_books_by_author(self,book_author):
@@ -222,6 +221,36 @@ class Library:
         # for lib_card in late_readers:
         #     print(lib_card, )
         return all_overdue, late_readers
+    
+    def get_borrowed_by_user(self,lib_card):
+        borrowed_list = []
+        reader = self.readers[lib_card]
+        borrowed_books = reader.view_borrowed()
+        for book_id, dates in borrowed_books.items():
+            borrow_date = dates[0]
+            return_date = dates[1]
+            if return_date == 0:
+                return_date = "-"
+            book_name = self.books[book_id].name
+            book_author = self.books[book_id].author
+            borrowed_list.append(f'ID: {book_id} Knyga: **{book_name}**, autorius: **{book_author}**, paimta: **{borrow_date}**, grąžinta: **{return_date}**')
+        return borrowed_list
+    
+    def get_currently_borrowed_by_user(self,lib_card):
+        borrowed_dict = {}
+        reader = self.readers[lib_card]
+        borrowed_books = reader.view_borrowed()
+        for book_id, dates in borrowed_books.items():
+            borrow_date = dates[0]
+            return_date = dates[1]
+            if return_date == 0:
+                book_name = self.books[book_id].name
+                book_author = self.books[book_id].author
+                borrowed_dict[book_id] = f'ID: {book_id} Knyga: {book_name}, autorius: {book_author}, paimta: {borrow_date}'
+            
+        return borrowed_dict
+
+        
 
            
 
