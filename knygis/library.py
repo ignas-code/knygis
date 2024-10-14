@@ -33,8 +33,11 @@ class Library:
         return books
 
     def all_readers(self):
+        all_readers = []
         for value in self.readers.values():
+            all_readers.append(f'{value.lib_card}, {value.username}')
             print(value.lib_card, value.username) # value.books_borrowed
+        return all_readers
 
     def borrow_book(self,book_id,lib_card):
         current_date = dt.now().date().strftime("%Y-%m-%d")
