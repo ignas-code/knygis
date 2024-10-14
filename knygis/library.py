@@ -26,8 +26,11 @@ class Library:
             self.bookid += 1
 
     def all_books(self):
+        books = []
         for id, object in self.books.items():
+            books.append(f'ID: {id}, Knyga: {object}')
             print(f'ID: {id}, Knyga: {object}')
+        return books
 
     def all_readers(self):
         for value in self.readers.values():
@@ -283,3 +286,4 @@ if __name__ == "__main__":
 
 
     lib.get_all_overdue()
+    print(lib.all_books())
