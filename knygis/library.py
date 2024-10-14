@@ -67,8 +67,6 @@ class Library:
             if book_id not in reader.books_borrowed or borrowed_before: # test if book was borrowed previously
                 reader.books_borrowed[book_id] = [current_date, return_date] # if book is taken 2nd time, record will be rewritten
                 book.borrowed_cur += 1
-                # stores borrowed book_id as key and current date as value
-                # append to user books borrowed as well
                 print(f'Knyga "{book.name}" sėkmingai paimta ({current_date})')
                 return f'Knyga "{book.name}" sėkmingai paimta ({current_date})'
             else:
@@ -93,8 +91,6 @@ class Library:
         if book_id in reader.books_borrowed:
             reader.books_borrowed[book_id][1] = return_date # {bookd_id: [borrow_date, return_date]}
             book.borrowed_cur -= 1
-            # stores borrowed book_id as key and current date as value
-            # append to user books borrowed as well
             print(f'Knyga "{book.name}" sėkmingai grąžinta ({return_date})')
             return f'Knyga "{book.name}" sėkmingai grąžinta ({return_date})'
         else:
@@ -136,7 +132,7 @@ class Library:
                 print(book)
         else:
             print(f'Knygų su autoriumi "{book_author}" nerasta')
-            return False
+            return [f'Knygų su autoriumi "{book_author}" nerasta']
         return found_books
     
     def _remove_book(self,bookid): #be careful, no safety checks at all

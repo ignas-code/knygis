@@ -245,12 +245,10 @@ def show_find_books():
     elif search_option == "Ieškoti pagal autorių":
         author_name = st.text_input("Įveskite autoriaus vardą:")
         if author_name:
-            st.write(f"Paieška knygoms pagal autorių: {author_name}")
-            # Replace the following with your book search logic
-            # books_found = search_books_by_author(author_name)
-            # Display the results here
-
-
+            results = lib.find_books_by_author(author_name)
+            for book in results:
+                st.write(f'{book}')
+            
 if __name__ == "__main__":
     lib = initial_load()
     main(lib)
