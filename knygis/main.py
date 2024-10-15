@@ -1,6 +1,7 @@
 import streamlit as st
 from load_save import initial_load,save
 from initial_data import initial_readers, initial_books
+import settings
 
 def main(lib):
     st.title("Biblioteka")
@@ -110,6 +111,9 @@ def show_home():
 
 def show_add_book():
     st.subheader("Pridėti knygą")
+    max_chars = settings.max_chars
+    st.write(f"Laukelio įvesties ilgis turi neviršyti {max_chars} simbolių")
+    
     
     with st.form(key='add_book_form'):
         name = st.text_input("Įveskite knygos pavadinimą:")
@@ -119,6 +123,17 @@ def show_add_book():
         quantity = st.number_input("Įveskite kiekį:", min_value=1, max_value=200, step=1)
     
         submit_button = st.form_submit_button("Pridėti")
+
+        
+        if len(name) >= max_chars:
+            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+            name = name[:max_chars]
+        if len(author) >= max_chars:
+            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+            author = author[:max_chars]
+        if len(genre) >= max_chars:
+            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+            genre = genre[:max_chars]
 
         if submit_button:
             if name and author and genre:
@@ -134,6 +149,7 @@ def show_contact_us():
 
 def show_log_out():
     st.subheader("Atsijungti")
+    st.write("Ar tikrai norite atsijungti?")
     submit_button = st.button("Atsijungti")
     if submit_button:
         st.session_state.logged_in = False
@@ -176,7 +192,13 @@ def show_remove_books():
 
 def show_add_reader():
     st.subheader("Pridėti skaitytoją")
+    max_chars = settings.max_chars_username
+    st.write(f"Sukūrus skaitytoją, skaitytojo kortelės numeris bus sugeneruotas automatiškai. Vartojo vardas neturi viršyti {max_chars} simbolių")
     input_username = st.text_input("Įveskite vartotojo vardą:")
+    if len(input_username) >= max_chars:
+        st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+        input_username = input_username[:max_chars]
+
     if st.button("Pridėti"):
         id = lib.add_reader(input_username)
         save(lib)
