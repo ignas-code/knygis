@@ -197,7 +197,7 @@ def show_remove_books():
     if book_id is not None and book_id in lib.books:
         try:
             st.write(f"{lib.books[book_id]}")
-            if st.button("Pašalinti knyg"):
+            if st.button("Pašalinti pagal ID"):
                 removed_book = lib.remove_book(book_id)
                 st.write("Knyga pašalinta!")
                 save(lib)
