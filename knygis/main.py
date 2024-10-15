@@ -17,7 +17,7 @@ def main(lib):
         page_option = st.sidebar.radio("Pasirinkite", ["Skaitytojo puslapis", "Bibliotekininko puslapis"])
         if page_option == "Skaitytojo puslapis":
             lib_card = st.text_input("Įveskite savo skaitytojo kortelės numerį:")
-            if st.button("Prisijungti"):
+            if st.button("Prisijungti") or lib_card:
                 if lib_card in lib.readers:
                     reader = lib.readers[lib_card]
                     username = reader.username
@@ -34,7 +34,7 @@ def main(lib):
         elif page_option == "Bibliotekininko puslapis":
             librarian_username = st.text_input("Įveskite vartotojo vardą:")
             librarian_password = st.text_input("Įveskite vartotojo slaptažodį:", type='password') 
-            if st.button("Prisijungti"):
+            if st.button("Prisijungti") or librarian_password:
                 if librarian_username == lib.librarian.username and librarian_password == lib.librarian.password: 
                     st.session_state.logged_in = True
                     st.session_state.lib_card = None
@@ -242,10 +242,13 @@ def show_borrow_book():
         
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
+    st.write("Šiuo metu jūsų paimtos knygos")
     borrowed_books = lib.get_borrowed_by_user(st.session_state.lib_card)
     if borrowed_books:
         for item in borrowed_books:
             st.write(item)
+        st.subheader("Anksčiau paimtos knygos")
+        st.write("Anksčiau jūsų paimtos knygos (grąžintos)")
     else:
         st.write("Šiuo metu neturite paėmę knygų")
 
