@@ -219,12 +219,12 @@ def show_all_readers():
 def show_late_books():
     st.subheader("Vėluojančios knygos")
     all_overdue, late_readers = lib.get_all_overdue()
-    st.write("Vėluojančios knygos:")
+    st.write("**Vėluojančios knygos:**")
     for book in all_overdue:
-        st.write(book)
-    st.write("Vėluojantys grąžinti skaitytojai:")
+        st.write(f'{lib.books[book]}')
+    st.write("**Vėluojantys grąžinti skaitytojai:**")
     for reader in late_readers:
-        st.write(reader)
+        st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
@@ -290,7 +290,7 @@ def show_initialize_data():
     st.write("Sukelkite iš anksto numatytus duomenis (knygas ir vartotojus)")
     if lib.initialized_data == False:
         if st.button("Inicializuoti"):
-            lib.add_reader("Ignas Ti")
+            first_reader = lib.add_reader("Ignas Ti")
             for reader in initial_readers:
                 lib.add_reader(reader)
             names = initial_books[0]   
@@ -299,7 +299,8 @@ def show_initialize_data():
             genres = initial_books[3]
             quantities = initial_books[4]
             for i in range(len(names)):
-                lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])
+                lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])  
+            lib._borrow_late_book(0,first_reader)
             st.write("Duomenys inicializuoti")
             lib.initialized_data = True
             save(lib)

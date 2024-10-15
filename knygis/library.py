@@ -1,6 +1,7 @@
 from books import Book
 from user import Reader, Librarian
 from datetime import datetime as dt
+from datetime import timedelta
 import random
 import settings
 import pandas as pd
@@ -101,6 +102,47 @@ class Library:
         else:
             print("Nepakankamas likutis")
             return "Nepakankamas likutis"
+    
+    def _borrow_late_book(self,book_id,lib_card):
+        "Dev use only. Changes the borrowing date to -15 days"
+        current_date = dt.now().date()
+        current_date = current_date - timedelta(days=15)
+        current_date = current_date.strftime("%Y-%m-%d")
+        return_date = 0
+        try:
+            book = self.books[book_id]
+        except:
+            print("Knyga nerasta")
+            return "Knyga nerasta"
+        try:
+            reader = self.readers[lib_card]
+        except:
+            print("Skaitytojas nerastas")
+            return "Skaitytojas nerastas"
+        users_overdue_books = self.get_reader_overdue(lib_card)
+        if users_overdue_books:
+            print("Turite knygų negražintų laiku: ")
+            for book_id in users_overdue_books:
+                print(self.books[book_id].name,self.books[book_id].author)
+            print("Pirmiausia grąžinkite vėluojančias knygas!")
+            return "Pirmiausia grąžinkite vėluojančias knygas!"
+        if book.quantity > book.borrowed_cur:
+            try:
+                borrowed_before = bool(reader.books_borrowed[book_id][1]) # check if book return date is present
+            except (KeyError, IndexError):
+                borrowed_before = False
+            if book_id not in reader.books_borrowed or borrowed_before: # test if book was borrowed previously
+                reader.books_borrowed[book_id] = [current_date, return_date] # if book is taken 2nd time, record will be rewritten
+                book.borrowed_cur += 1
+                print(f'Knyga "{book.name}" sėkmingai paimta ({current_date})')
+                return f'Knyga "{book.name}" sėkmingai paimta ({current_date})'
+            else:
+                print("Knyga jau paimta")
+                return "Knyga jau paimta"
+        else:
+            print("Nepakankamas likutis")
+            return "Nepakankamas likutis"
+    
     
     def return_book(self,book_id,lib_card):
         return_date = dt.now().date().strftime("%Y-%m-%d")
