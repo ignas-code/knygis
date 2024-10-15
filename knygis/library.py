@@ -1,6 +1,7 @@
 from books import Book
 from user import Reader, Librarian
 from datetime import datetime as dt
+import random
 import settings
 import pandas as pd
 
@@ -124,7 +125,8 @@ class Library:
         
     def add_reader(self,username):
         self.lib_card_num += 1 # increment the library card ID number
-        lib_card = f'BIB{self.lib_card_num:05}'
+        random_num = random.randint(100,999)
+        lib_card = f'BIB{random_num}{self.lib_card_num:0}'
         books_borrowed = {} # dictionary where key is book ID, and value is borrowing date
         reader = Reader(username,lib_card,books_borrowed)
         self.readers[lib_card] = reader

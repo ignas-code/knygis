@@ -161,7 +161,8 @@ def show_all_books():
     st.write("Čia galite peržiūrėti visas mūsų bibliotekoje esančias knygas")
     st.subheader("Mūsų knygos:")
     books_data = lib.all_books()
-    st.dataframe(books_data, width=800, height=1000)
+    st.dataframe(books_data, width=800, height=1000, hide_index=True)
+    
 
 def show_remove_books():
     st.subheader("Pašalinti knygas")
@@ -289,9 +290,9 @@ def show_initialize_data():
     st.write("Sukelkite iš anksto numatytus duomenis (knygas ir vartotojus)")
     if lib.initialized_data == False:
         if st.button("Inicializuoti"):
+            lib.add_reader("Ignas Ti")
             for reader in initial_readers:
                 lib.add_reader(reader)
-            
             names = initial_books[0]   
             authors = initial_books[1]
             years = initial_books[2] 
