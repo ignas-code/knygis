@@ -6,15 +6,16 @@ Knygyno Informacinė Sistema - paprasta bibliotekos valdymo programa
 ## Turinys
 
 - [Įžanga](#įžanga)
-- [Funkcijos](#funkcijos)
+- [Paleidimas](#paleidimas)
 
 ## Įžanga
 
 Šio projekto tikslas sukurti nesudėtingą bibliotekos valdymo programą naudojant Python.
 
-## Funkcijos
+## Paleidimas
 
-- knygis funkcijos:
-  - Funkcija 1
-  - Funkcija 2
-  - Funkcija 3
+Iš projekto šakninės direktorijos aktyvuokite virtualią aplinką ir paleiskite `main.py` failiuką su `poetry`
+```sh
+poetry shell
+streamlit run knygis/main.py
+```
