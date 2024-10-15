@@ -25,23 +25,23 @@ streamlit run knygis/main.py
 ### Prisijungimas
 
 Programoje yra prisijungimo langas, kuriame vartotojai gali pasirinkti:
-- **Skaitytojo puslapis**: Skaitytojai gali prisijungti įvedę savo skaitytojo kortelės numerį.
-- **Bibliotekininko puslapis**: Bibliotekininkai gali prisijungti naudodami savo vartotojo vardą ir slaptažodį.
+- *Skaitytojo puslapis*: Skaitytojai gali prisijungti įvedę savo skaitytojo kortelės numerį.
+- *Bibliotekininko puslapis*: Bibliotekininkai gali prisijungti naudodami savo vartotojo vardą ir slaptažodį.
 
 ### Skaitytojo funkcijos:
-- **Peržiūrėti knygas**: Peržiūrėti visų bibliotekos knygų sąrašą, surūšiuoti jų atvaizdavimą pagal įvairius kriterijus.
-- **Pasiimti knygą**: Pasiimti knygą, jei neturi neatiduotų ir vėluojančių knygų.
-- **Grąžinti knygą**: Pasirinkti iš sąrašo savo turimų knygų ir grąžinti norimą knygą.
-- **Ieškoti knygų**: Ieškoti knygų pagal pavadinimą ar autorių.
-- **Peržiūrėti savo knygas**:  Peržiūrėti savo paimtas knygas, kada jos buvo paimtos ir grąžintos.
-- **Atsijungti**: Baigti sesiją.
+- *Peržiūrėti knygas*: Peržiūrėti visų bibliotekos knygų sąrašą, surūšiuoti jų atvaizdavimą pagal įvairius kriterijus.
+- *Pasiimti knygą*: Pasiimti knygą, jei neturi neatiduotų ir vėluojančių knygų.
+- *Grąžinti knygą*: Pasirinkti iš sąrašo savo turimų knygų ir grąžinti norimą knygą.
+- *Ieškoti knygų*: Ieškoti knygų pagal pavadinimą ar autorių.
+- *Peržiūrėti savo knygas*:  Peržiūrėti savo paimtas knygas, kada jos buvo paimtos ir grąžintos.
+- *Atsijungti*: Baigti sesiją.
 
 ### Bibliotekininko funkcijos:
-- **Pridėti knygą**: Įvesti norimą kiekį naujų knygų. Jei knyga jau egzistuoja, jos kiekis bus atnaujintas.
-- **Pašalinti knygas**: Pašalinti knygas, kurių leidimo data senesnė nei pasirinkta, arba pašalinti knygas pagal knygos ID.
-- **Peržiūrėti knygas**: Matyti visą bibliotekos knygų sąrašą.
-- **Pridėti skaitytoją**: Įvesti vartotojo vardą ir paspausti 'pridėti'. Skaitytojo kortelės kodas bus sugeneruotas automatiškai ir parodytas ekrane.
-- **Peržiūrėti skaitytojus**: Rodyti visus skaitytojus ir jų skaitytojo kortelės kodus.
-- **Peržiūrėti vėluojančias knygas**: Matyti, kurios knygos vėluoja, ir kurie vartotojai turi vėluojančių knygų.
-- **Inicializuoti duomenis**: Galimybė įkelti iš anksto numatytus duomenis, jei tai dar nebuvo atlikta.
-- **Atsijungti**: Baigti sesiją.
+- *Pridėti knygą*: Įvesti norimą kiekį naujų knygų. Jei knyga jau egzistuoja, jos kiekis bus atnaujintas.
+- *Pašalinti knygas*: Pašalinti knygas, kurių leidimo data senesnė nei pasirinkta, arba pašalinti knygas pagal knygos ID.
+- *Peržiūrėti knygas*: Matyti visą bibliotekos knygų sąrašą.
+- *Pridėti skaitytoją*: Įvesti vartotojo vardą ir paspausti 'pridėti'. Skaitytojo kortelės kodas bus sugeneruotas automatiškai ir parodytas ekrane.
+- *Peržiūrėti skaitytojus*: Rodyti visus skaitytojus ir jų skaitytojo kortelės kodus.
+- *Peržiūrėti vėluojančias knygas*: Matyti, kurios knygos vėluoja, ir kurie vartotojai turi vėluojančių knygų.
+- *Inicializuoti duomenis*: Galimybė įkelti iš anksto numatytus duomenis, jei tai dar nebuvo atlikta.
+- *Atsijungti*: Baigti sesiją.
