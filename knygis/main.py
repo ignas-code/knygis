@@ -122,6 +122,7 @@ def show_add_book():
         year = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=2000)
         genre = st.text_input("Įveskite žanrą:")
         quantity = st.number_input("Įveskite kiekį:", min_value=1, max_value=200, step=1)
+        #quantity = st.slider("Pasirinkite kiekį:", min_value=1, max_value=200, value=10, step=1)
     
         submit_button = st.form_submit_button("Pridėti")
 
@@ -203,6 +204,8 @@ def show_remove_books():
                 save(lib)
         except KeyError:
             st.write("Knyga neegzistuoja")
+    else:
+        st.write("Knyga neegzistuoja")
 
 
 def show_add_reader():
@@ -230,13 +233,19 @@ def show_all_readers():
 
 def show_late_books():
     st.subheader("Vėluojančios knygos")
+
     all_overdue, late_readers = lib.get_all_overdue()
     st.write("**Vėluojančios knygos:**")
-    for book in all_overdue:
-        st.write(f'{lib.books[book]}')
+    if all_overdue:
+        for book in all_overdue:
+            try:
+                st.write(f'{lib.books[book]}')
+            except:
+                st.write(f'Knyga ištrinta, bet vartotojo negrąžinta')
     st.write("**Vėluojantys grąžinti skaitytojai:**")
-    for reader in late_readers:
-        st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
+    if late_readers:
+        for reader in late_readers:
+            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
