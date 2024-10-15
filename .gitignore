@@ -166,6 +166,3 @@ cython_debug/
 
 # pickle files
 lib.pickle
-
-# things to improve/add
-to_do.py
