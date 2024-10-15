@@ -277,11 +277,11 @@ def show_borrow_book():
             st.write(result)
             save(lib)
     except KeyError:
-        st.write("Knyga neegzistuoja")
+        st.error("Knyga neegzistuoja")
         
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
-    st.write("Šiuo metu jūsų paimtos knygos")
+    st.write("Jūsų paimtos knygos:")
     borrowed_books = lib.get_borrowed_by_user(st.session_state.lib_card)
     if borrowed_books:
         for item in borrowed_books:
@@ -291,7 +291,7 @@ def show_borrowed_by_user():
         #separate currently and previously borrowed books
 
     else:
-        st.write("Šiuo metu neturite paėmę knygų")
+        st.error("Šiuo metu neturite paėmę knygų")
 
 def show_return_book():
     st.subheader("Grąžinti knygą")
