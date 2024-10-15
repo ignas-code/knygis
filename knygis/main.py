@@ -239,10 +239,13 @@ def show_add_reader():
 
 def show_all_readers():
     st.subheader("Peržiūrėti skaitytojus")
+    st.write("Čia galite matyti visus skaitytojus ir jų skaitytojo ID")
     all_readers = lib.all_readers()
+    split_readers = [reader.split(", ") for reader in all_readers]
+    print(split_readers)
+    df = pd.DataFrame(split_readers, columns=["Skaitytojo ID","Vartotojo vardas"])
     if all_readers:
-        for reader in all_readers:
-            st.write(reader)
+        st.table(df)
     else:
         st.write("Skaitytojų nėra")
 
