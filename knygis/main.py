@@ -1,6 +1,9 @@
 import streamlit as st
+import pandas as pd
 from load_save import initial_load,save
 from initial_data import initial_readers, initial_books
+import settings
+
 
 def main(lib):
     st.title("Biblioteka")
@@ -110,6 +113,9 @@ def show_home():
 
 def show_add_book():
     st.subheader("Pridėti knygą")
+    max_chars = settings.max_chars
+    st.write(f"Laukelio įvesties ilgis turi neviršyti {max_chars} simbolių")
+    
     
     with st.form(key='add_book_form'):
         name = st.text_input("Įveskite knygos pavadinimą:")
@@ -119,6 +125,17 @@ def show_add_book():
         quantity = st.number_input("Įveskite kiekį:", min_value=1, max_value=200, step=1)
     
         submit_button = st.form_submit_button("Pridėti")
+
+        
+        if len(name) >= max_chars:
+            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+            name = name[:max_chars]
+        if len(author) >= max_chars:
+            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+            author = author[:max_chars]
+        if len(genre) >= max_chars:
+            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+            genre = genre[:max_chars]
 
         if submit_button:
             if name and author and genre:
@@ -134,16 +151,18 @@ def show_contact_us():
 
 def show_log_out():
     st.subheader("Atsijungti")
+    st.write("Ar tikrai norite atsijungti?")
     submit_button = st.button("Atsijungti")
     if submit_button:
         st.session_state.logged_in = False
         st.rerun()
 
 def show_all_books():
+    st.write("Čia galite peržiūrėti visas mūsų bibliotekoje esančias knygas")
     st.subheader("Mūsų knygos:")
-    books = lib.all_books()
-    for book in books:
-        st.write(book)
+    books_data = lib.all_books()
+    st.dataframe(books_data, width=800, height=1000, hide_index=True)
+    
 
 def show_remove_books():
     st.subheader("Pašalinti knygas")
@@ -176,7 +195,13 @@ def show_remove_books():
 
 def show_add_reader():
     st.subheader("Pridėti skaitytoją")
+    max_chars = settings.max_chars_username
+    st.write(f"Sukūrus skaitytoją, skaitytojo kortelės numeris bus sugeneruotas automatiškai. Vartojo vardas neturi viršyti {max_chars} simbolių")
     input_username = st.text_input("Įveskite vartotojo vardą:")
+    if len(input_username) >= max_chars:
+        st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
+        input_username = input_username[:max_chars]
+
     if st.button("Pridėti"):
         id = lib.add_reader(input_username)
         save(lib)
@@ -194,12 +219,12 @@ def show_all_readers():
 def show_late_books():
     st.subheader("Vėluojančios knygos")
     all_overdue, late_readers = lib.get_all_overdue()
-    st.write("Vėluojančios knygos:")
+    st.write("**Vėluojančios knygos:**")
     for book in all_overdue:
-        st.write(book)
-    st.write("Vėluojantys grąžinti skaitytojai:")
+        st.write(f'{lib.books[book]}')
+    st.write("**Vėluojantys grąžinti skaitytojai:**")
     for reader in late_readers:
-        st.write(reader)
+        st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
@@ -265,16 +290,17 @@ def show_initialize_data():
     st.write("Sukelkite iš anksto numatytus duomenis (knygas ir vartotojus)")
     if lib.initialized_data == False:
         if st.button("Inicializuoti"):
+            first_reader = lib.add_reader("Ignas Ti")
             for reader in initial_readers:
                 lib.add_reader(reader)
-            
             names = initial_books[0]   
             authors = initial_books[1]
             years = initial_books[2] 
             genres = initial_books[3]
             quantities = initial_books[4]
             for i in range(len(names)):
-                lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])
+                lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])  
+            lib._borrow_late_book(0,first_reader)
             st.write("Duomenys inicializuoti")
             lib.initialized_data = True
             save(lib)

@@ -1,7 +1,10 @@
 from books import Book
 from user import Reader, Librarian
 from datetime import datetime as dt
+from datetime import timedelta
+import random
 import settings
+import pandas as pd
 
 class Library:
     def __init__(self):
@@ -27,11 +30,34 @@ class Library:
             self.bookid += 1
 
     def all_books(self):
-        books = []
-        for id, object in self.books.items():
-            books.append(f'ID: {id}, Knyga: {object}')
-            print(f'ID: {id}, Knyga: {object}')
-        return books
+        ids = []
+        names = []
+        authors = []
+        years = []
+        genres = []
+        quantities = []
+        borrowed = []
+        for book_id, book in self.books.items():
+            ids.append(book_id)
+            names.append(book.name)
+            authors.append(book.author)
+            years.append(book.year)
+            genres.append(book.genre)
+            quantities.append(book.quantity)
+            borrowed.append(book.borrowed_cur)
+
+        data = {
+        'ID': ids,
+        'Pavadinimas': names,
+        'Autorius': authors,
+        'Metai': years,
+        'Žanras': genres,
+        'Kiekis': quantities,
+        'Paimta': borrowed
+        }
+
+        df = pd.DataFrame(data)
+        return df
 
     def all_readers(self):
         all_readers = []
@@ -77,6 +103,47 @@ class Library:
             print("Nepakankamas likutis")
             return "Nepakankamas likutis"
     
+    def _borrow_late_book(self,book_id,lib_card):
+        "Dev use only. Changes the borrowing date to -15 days"
+        current_date = dt.now().date()
+        current_date = current_date - timedelta(days=15)
+        current_date = current_date.strftime("%Y-%m-%d")
+        return_date = 0
+        try:
+            book = self.books[book_id]
+        except:
+            print("Knyga nerasta")
+            return "Knyga nerasta"
+        try:
+            reader = self.readers[lib_card]
+        except:
+            print("Skaitytojas nerastas")
+            return "Skaitytojas nerastas"
+        users_overdue_books = self.get_reader_overdue(lib_card)
+        if users_overdue_books:
+            print("Turite knygų negražintų laiku: ")
+            for book_id in users_overdue_books:
+                print(self.books[book_id].name,self.books[book_id].author)
+            print("Pirmiausia grąžinkite vėluojančias knygas!")
+            return "Pirmiausia grąžinkite vėluojančias knygas!"
+        if book.quantity > book.borrowed_cur:
+            try:
+                borrowed_before = bool(reader.books_borrowed[book_id][1]) # check if book return date is present
+            except (KeyError, IndexError):
+                borrowed_before = False
+            if book_id not in reader.books_borrowed or borrowed_before: # test if book was borrowed previously
+                reader.books_borrowed[book_id] = [current_date, return_date] # if book is taken 2nd time, record will be rewritten
+                book.borrowed_cur += 1
+                print(f'Knyga "{book.name}" sėkmingai paimta ({current_date})')
+                return f'Knyga "{book.name}" sėkmingai paimta ({current_date})'
+            else:
+                print("Knyga jau paimta")
+                return "Knyga jau paimta"
+        else:
+            print("Nepakankamas likutis")
+            return "Nepakankamas likutis"
+    
+    
     def return_book(self,book_id,lib_card):
         return_date = dt.now().date().strftime("%Y-%m-%d")
         try:
@@ -100,7 +167,8 @@ class Library:
         
     def add_reader(self,username):
         self.lib_card_num += 1 # increment the library card ID number
-        lib_card = f'BIB{self.lib_card_num:05}'
+        random_num = random.randint(100,999)
+        lib_card = f'BIB{random_num}{self.lib_card_num:04}'
         books_borrowed = {} # dictionary where key is book ID, and value is borrowing date
         reader = Reader(username,lib_card,books_borrowed)
         self.readers[lib_card] = reader
