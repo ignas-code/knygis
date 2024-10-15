@@ -166,12 +166,3 @@ cython_debug/
 
 # pickle files
 lib.pickle
-
-# temporary file for testing
-temp.py
-
-# things to improve/add
-to_do.py
-
-# leftover code from testing
-old_streamlit.py

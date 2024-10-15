@@ -263,7 +263,7 @@ def show_late_books():
     st.write("**Vėluojantys grąžinti skaitytojai:**")
     if late_readers:
         for reader in late_readers:
-            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
+            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas: {lib.readers[reader].username}')
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
@@ -347,7 +347,7 @@ def show_initialize_data():
             quantities = initial_books[4]
             for i in range(len(names)):
                 lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])  
-            lib._borrow_late_book(0,first_reader)
+            lib.borrow_late_book(0,first_reader)
             st.write("Duomenys inicializuoti")
             lib.initialized_data = True
             save(lib)
