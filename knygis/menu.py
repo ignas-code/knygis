@@ -134,10 +134,6 @@ q - Grįžti\n""")
                             print("Operacija atšaukta")      
        
                 save(lib)
-                # additional checks required
-                # book_id = input("Įveskite knygos ID: ")
-                # book_id = int(book_id)
-                # lib.remove_book(book_id)
 
             case '3': # 3 - Peržiūrėti knygas
                 lib.all_books()

@@ -11,15 +11,16 @@ class Book:
         return f'{self.name}, {self.author}, {self.year}m., {self.genre}, viso: {self.quantity}vnt., paimta: {self.borrowed_cur}'
     
     def __eq__(self, other): # __eq__ defines how class instances can be compared
-        if isinstance(other, Book): # is it an instance of Book class
+        if isinstance(other, Book):
             return (self.name == other.name and
                     self.author == other.author and
                     self.year == other.year and
                     self.genre == other.genre)
                     #self.quantity == other.quantity) # do not check for quantity
-        return False # if other is not a Book
+        return False
 
 if __name__ == "__main__":
+    # for testing purposes only
     knyga1 = Book("Svetimas","Alberas Kamiu",1942,"romanas",12)
     print(knyga1)
     print(knyga1.quantity)

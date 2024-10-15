@@ -9,24 +9,23 @@ import pandas as pd
 class Library:
     def __init__(self):
         self.bookid = 0
-        self.books = {} # book class instances in a dictionary
+        self.books = {}
         self.readers = {} # readers - key:lib_card, value: Reader object
         self.lib_card_num = 0
         self.librarian = Librarian(settings.librarian_username,settings.librarian_password)
         self.initialized_data = False
 
     def add_book(self,name,author,year,genre,quantity):
-        if quantity > 0: # cannot add 0 or negative of book
+        if quantity > 0:
             new_book = Book(name,author,year,genre,quantity)
             for id, existing_book in self.books.items():
                 if existing_book == new_book:
                     current_quantity = existing_book.quantity
                     new_quantity = current_quantity + quantity
                     existing_book.quantity = new_quantity
-    #               print("book already exists")
                     return
             
-            self.books[self.bookid] = new_book # dict[key] = value
+            self.books[self.bookid] = new_book
             self.bookid += 1
 
     def all_books(self):
@@ -63,7 +62,7 @@ class Library:
         all_readers = []
         for value in self.readers.values():
             all_readers.append(f'{value.lib_card}, {value.username}')
-            print(value.lib_card, value.username) # value.books_borrowed
+            print(value.lib_card, value.username)
         return all_readers
 
     def borrow_book(self,book_id,lib_card):
@@ -211,7 +210,6 @@ class Library:
     def remove_book(self,bookid): #be careful, no safety checks at all
         try:
             removed_book = self.books.pop(bookid)
-            #print(f'Knyga "{removed_book}" pašalinta')
             return removed_book
         except KeyError:
             print(f'Knyga su id {bookid} nerasta')
@@ -241,14 +239,14 @@ class Library:
             return False
 
     def remove_obsolete_books(self,criteria): # does not delete book records from readers who have that book taken
-                                              # add self.deleted_books = {} and put "popped" books there 
+                                              # add self.deleted_books = {} and put "popped" books there in the future
         removed_books = []
-        book_ids = list(self.books.keys()) # Cannot iterate over a dictionary, which changes its size otherwise
+        book_ids = list(self.books.keys()) # Cannot iterate over a dictionary, which changes its size
         for book_id in book_ids:
             book_year = self.books[book_id].year
             book_borrowed = self.books[book_id].borrowed_cur
             try:
-                book_year = int(book_year) # make sure the input year is of int type
+                book_year = int(book_year)
             except:
                 print("Klaida `rem_ob_1`")
                 return False
@@ -290,10 +288,6 @@ class Library:
                     all_overdue.append(overdue_book_id)
                     late_readers.append(lib_card)
                     print(f'Skaitytojas: {late_reader}, knyga: {late_book}')
-        # for book_id in all_overdue:
-        #     print()
-        # for lib_card in late_readers:
-        #     print(lib_card, )
         return all_overdue, late_readers
     
     def get_borrowed_by_user(self,lib_card):
@@ -325,67 +319,23 @@ class Library:
         return borrowed_dict
 
 if __name__ == "__main__":
+    # for testing purposes only
     lib = Library()
-    # for i in range(3):
-    #     lib.add_book("Svetimas","Alberas Kamiu",1942,"romanas",12)
     for i in range(9):
         lib.add_book("Lustu karas","Chris Miller",2024,"publicistika",2)
     lib.add_book("Atominiai iprociai","Hanes Clear",2019,"dalykine",-1)
     lib.add_book("Atominiai iprociai","Hanes Clear",2019,"dalykine",10)
     lib.add_book("Fear no evil","Natan",1988,"zanras",2)
     lib._remove_book(4)
-    # print(lib.borrow_book(2))
-    # print(lib.borrow_book(2))
-
-    # for i in range(2):
-    #     name = f'pavadinimas {i}'
-    #     lib.add_book(name,"autorius","metai ","zanras","kiekis ")
-    # lib.all_books()
-    # lib.remove_book(25)
-    # lib.remove_book(3)
     lib.all_books()
     for i in range (3):
         lib.add_reader("Jonas Jonauskas")
     lib.add_reader("Tomas")
-    
-    # print(lib.librarian.username)
-    # print(lib.librarian.password)
-    # lib.borrow_book(2,"BIB00002")
-    # lib.borrow_book(2,"BIB00002")
-    # lib.borrow_book(2,"BIB0002")
-    # lib.borrow_book(1,"BIB00002")
-    # lib.borrow_book(0,"BIB00001")
-    # lib.borrow_book(1,"BIB00001")
-    # lib.borrow_book(2,"BIB00001")
-    # lib.return_book(2,"BIB00001")
-
-    
-
-
-
-#     for value in lib.readers.values():
-#         print(value.lib_card, value.username, value.books_borrowed) # value.books_borrowed
-
-#     a = lib.readers['BIB00001'].books_borrowed[2][1]
-#     print(a)
-#     print(bool(a))
-#     print(lib.readers)
-            # whole_str = self.books[book_id]
-            # name = self.books[book_id].name
-            # author = self.books[book_id].author
-            # genre = self.books[book_id].genre
     lib.find_books_by_name("ato")
     lib.all_readers()
     reader1 = lib.readers["BIB00001"]
     reader1_borrowed = reader1.books_borrowed
-    # print(reader1_borrowed)
-    # for book in reader1_borrowed:
-    #         print(reader1_borrowed[book][0],reader1_borrowed[book][1])
-    # print(reader1.get_overdue())
-    # print(lib.get_reader_overdue("BIB00001"))
     lib.borrow_book(1,"BIB00001")
     lib.borrow_book(2,"BIB00001")
-
-
     lib.get_all_overdue()
     print(lib.all_books())

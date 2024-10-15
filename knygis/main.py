@@ -263,7 +263,7 @@ def show_late_books():
     st.write("**Vėluojantys grąžinti skaitytojai:**")
     if late_readers:
         for reader in late_readers:
-            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
+            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas: {lib.readers[reader].username}')
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
