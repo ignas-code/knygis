@@ -252,7 +252,7 @@ class Library:
                 print("Klaida `rem_ob_1`")
                 return False
             if book_year < criteria:
-                removed_book = self._remove_book(book_id)
+                removed_book = self.remove_book(book_id)
                 removed_books.append(removed_book)
         if removed_books:
             if len(removed_books) == 1:
