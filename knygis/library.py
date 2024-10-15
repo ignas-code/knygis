@@ -208,7 +208,7 @@ class Library:
             return f'Knygų su autoriumi "{book_author}" nerasta'
         return found_books_dict
     
-    def _remove_book(self,bookid): #be careful, no safety checks at all
+    def remove_book(self,bookid): #be careful, no safety checks at all
         try:
             removed_book = self.books.pop(bookid)
             #print(f'Knyga "{removed_book}" pašalinta')
