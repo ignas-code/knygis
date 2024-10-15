@@ -114,7 +114,10 @@ def show_home():
 def show_add_book():
     st.subheader("Pridėti knygą")
     max_chars = settings.max_chars
-    st.write(f"Laukelio įvesties ilgis turi neviršyti {max_chars} simbolių")
+    st.write("Užpildykite laukelius ir pridėkite norimą knygą. " \
+             "Jei tokia knyga jau egzistuoja, **bus papildytas jos kiekis**. "\
+             f"Laukelio įvesties ilgis iki {max_chars} simbolių. ")
+
 
     with st.form(key='add_book_form',clear_on_submit=True):
         name = st.text_input("Įveskite knygos pavadinimą:")
@@ -122,6 +125,7 @@ def show_add_book():
         year = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=2000)
         genre = st.text_input("Įveskite žanrą:")
         quantity = st.number_input("Įveskite kiekį:", min_value=1, max_value=200, step=1)
+        #quantity = st.slider("Pasirinkite kiekį:", min_value=1, max_value=200, value=10, step=1)
     
         submit_button = st.form_submit_button("Pridėti")
 
@@ -166,6 +170,7 @@ def show_all_books():
 def show_remove_books():
     st.subheader("Pašalinti knygas")
     st.write("Knygos, kurių leidimo data senesnė nei nurodyta, bus pašalintos.")
+    st.write("Atkreipkite dėmesį, jog paimtos knygos nebus pašalintos.")
     criteria = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=1800)
 
     if 'obsolete_books' not in st.session_state:
@@ -178,31 +183,44 @@ def show_remove_books():
         st.session_state.obsolete_books = obsolete
         st.session_state.remove_confirmed = False
         print(f'{obsolete}')
-    
+
     if st.session_state.obsolete_books:
         st.write("Ar tikrai norite pašalinti šias knygas?")
         for book in st.session_state.obsolete_books:
             st.write(f'{book}')
 
-        if st.button("Taip, pašalinti") and not st.session_state.remove_confirmed:
-            st.write("Ištrinta")
-            lib.remove_obsolete_books(criteria)
-            save(lib)
-            st.session_state.remove_confirmed = True
+        if st.session_state.remove_confirmed is False:
+            if st.button("Taip, pašalinti", type="primary") and not st.session_state.remove_confirmed:
+                lib.remove_obsolete_books(criteria)
+                save(lib)
+                st.session_state.remove_confirmed = True
+                st.success("Ištrinta")
     elif st.session_state.obsolete_books is False:
-        st.write(f"Knygų, kurių leidimo data senesnė nei nurodyta ({criteria}m.) nerasta")
+        st.error(f"Knygų, kurių leidimo data senesnė nei nurodyta (**{criteria}**m.) nerasta")
+
+    if st.session_state.remove_confirmed:
+        if st.button("Uždaryti"):
+            st.session_state.obsolete_books = None
+            st.session_state.remove_confirmed = False
+
+
 
     st.subheader("Pašalinti knygą pagal ID:")
     book_id = st.number_input("Įveskite norimos knygos ID:",min_value=0,step=1)
     if book_id is not None and book_id in lib.books:
         try:
             st.write(f"{lib.books[book_id]}")
-            if st.button("Pašalinti pagal ID"):
+            if st.button("Pašalinti pagal ID",type="primary", help = "Veiksmas neatšaukiamas"):
                 removed_book = lib.remove_book(book_id)
-                st.write("Knyga pašalinta!")
-                save(lib)
+                if removed_book.borrowed_cur >= 1:
+                    st.error("Negalima ištrinti! Knyga paimta")
+                else:
+                    st.success("Knyga pašalinta!")
+                    save(lib)
         except KeyError:
-            st.write("Knyga neegzistuoja")
+            st.error("Knyga neegzistuoja")
+    else:
+        st.error("Knyga neegzistuoja")
 
 
 def show_add_reader():
@@ -221,22 +239,31 @@ def show_add_reader():
 
 def show_all_readers():
     st.subheader("Peržiūrėti skaitytojus")
+    st.write("Čia galite matyti visus skaitytojus ir jų skaitytojo ID")
     all_readers = lib.all_readers()
+    split_readers = [reader.split(", ") for reader in all_readers]
+    print(split_readers)
+    df = pd.DataFrame(split_readers, columns=["Skaitytojo ID","Vartotojo vardas"])
     if all_readers:
-        for reader in all_readers:
-            st.write(reader)
+        st.table(df)
     else:
         st.write("Skaitytojų nėra")
 
 def show_late_books():
     st.subheader("Vėluojančios knygos")
+
     all_overdue, late_readers = lib.get_all_overdue()
     st.write("**Vėluojančios knygos:**")
-    for book in all_overdue:
-        st.write(f'{lib.books[book]}')
+    if all_overdue:
+        for book in all_overdue:
+            try:
+                st.write(f'{lib.books[book]}')
+            except:
+                st.write(f'Knyga ištrinta, bet vartotojo negrąžinta')
     st.write("**Vėluojantys grąžinti skaitytojai:**")
-    for reader in late_readers:
-        st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
+    if late_readers:
+        for reader in late_readers:
+            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas:{lib.readers[reader].username}')
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
@@ -250,11 +277,11 @@ def show_borrow_book():
             st.write(result)
             save(lib)
     except KeyError:
-        st.write("Knyga neegzistuoja")
+        st.error("Knyga neegzistuoja")
         
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
-    st.write("Šiuo metu jūsų paimtos knygos")
+    st.write("Jūsų paimtos knygos:")
     borrowed_books = lib.get_borrowed_by_user(st.session_state.lib_card)
     if borrowed_books:
         for item in borrowed_books:
@@ -264,7 +291,7 @@ def show_borrowed_by_user():
         #separate currently and previously borrowed books
 
     else:
-        st.write("Šiuo metu neturite paėmę knygų")
+        st.error("Šiuo metu neturite paėmę knygų")
 
 def show_return_book():
     st.subheader("Grąžinti knygą")
