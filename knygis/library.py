@@ -126,7 +126,7 @@ class Library:
     def add_reader(self,username):
         self.lib_card_num += 1 # increment the library card ID number
         random_num = random.randint(100,999)
-        lib_card = f'BIB{random_num}{self.lib_card_num:0}'
+        lib_card = f'BIB{random_num}{self.lib_card_num:04}'
         books_borrowed = {} # dictionary where key is book ID, and value is borrowing date
         reader = Reader(username,lib_card,books_borrowed)
         self.readers[lib_card] = reader
