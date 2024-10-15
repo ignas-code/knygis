@@ -243,8 +243,11 @@ def show_borrow_book():
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
     borrowed_books = lib.get_borrowed_by_user(st.session_state.lib_card)
-    for item in borrowed_books:
-        st.write(item)
+    if borrowed_books:
+        for item in borrowed_books:
+            st.write(item)
+    else:
+        st.write("Šiuo metu neturite paėmę knygų")
 
 def show_return_book():
     st.subheader("Grąžinti knygą")
