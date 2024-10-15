@@ -115,9 +115,8 @@ def show_add_book():
     st.subheader("Pridėti knygą")
     max_chars = settings.max_chars
     st.write(f"Laukelio įvesties ilgis turi neviršyti {max_chars} simbolių")
-    
-    
-    with st.form(key='add_book_form'):
+
+    with st.form(key='add_book_form',clear_on_submit=True):
         name = st.text_input("Įveskite knygos pavadinimą:")
         author = st.text_input("Įveskite autorių:")
         year = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=2000)
@@ -247,8 +246,10 @@ def show_borrowed_by_user():
     if borrowed_books:
         for item in borrowed_books:
             st.write(item)
-        st.subheader("Anksčiau paimtos knygos")
-        st.write("Anksčiau jūsų paimtos knygos (grąžintos)")
+        #st.subheader("Anksčiau paimtos knygos")
+        #st.write("Anksčiau jūsų paimtos knygos (grąžintos)")
+        #separate currently and previously borrowed books
+
     else:
         st.write("Šiuo metu neturite paėmę knygų")
 
