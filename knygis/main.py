@@ -347,7 +347,7 @@ def show_initialize_data():
             quantities = initial_books[4]
             for i in range(len(names)):
                 lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])  
-            lib._borrow_late_book(0,first_reader)
+            lib.borrow_late_book(0,first_reader)
             st.write("Duomenys inicializuoti")
             lib.initialized_data = True
             save(lib)

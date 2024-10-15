@@ -103,7 +103,7 @@ class Library:
             print("Nepakankamas likutis")
             return "Nepakankamas likutis"
     
-    def _borrow_late_book(self,book_id,lib_card):
+    def borrow_late_book(self,book_id,lib_card):
         "Dev use only. Changes the borrowing date to -15 days"
         current_date = dt.now().date()
         current_date = current_date - timedelta(days=15)
