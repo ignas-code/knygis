@@ -2,6 +2,7 @@ from books import Book
 from user import Reader, Librarian
 from datetime import datetime as dt
 import settings
+import pandas as pd
 
 class Library:
     def __init__(self):
@@ -27,11 +28,34 @@ class Library:
             self.bookid += 1
 
     def all_books(self):
-        books = []
-        for id, object in self.books.items():
-            books.append(f'ID: {id}, Knyga: {object}')
-            print(f'ID: {id}, Knyga: {object}')
-        return books
+        ids = []
+        names = []
+        authors = []
+        years = []
+        genres = []
+        quantities = []
+        borrowed = []
+        for book_id, book in self.books.items():
+            ids.append(book_id)
+            names.append(book.name)
+            authors.append(book.author)
+            years.append(book.year)
+            genres.append(book.genre)
+            quantities.append(book.quantity)
+            borrowed.append(book.borrowed_cur)
+
+        data = {
+        'ID': ids,
+        'Pavadinimas': names,
+        'Autorius': authors,
+        'Metai': years,
+        'Žanras': genres,
+        'Kiekis': quantities,
+        'Paimta': borrowed
+        }
+
+        df = pd.DataFrame(data)
+        return df
 
     def all_readers(self):
         all_readers = []

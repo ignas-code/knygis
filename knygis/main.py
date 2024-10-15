@@ -1,7 +1,9 @@
 import streamlit as st
+import pandas as pd
 from load_save import initial_load,save
 from initial_data import initial_readers, initial_books
 import settings
+
 
 def main(lib):
     st.title("Biblioteka")
@@ -156,10 +158,10 @@ def show_log_out():
         st.rerun()
 
 def show_all_books():
+    st.write("Čia galite peržiūrėti visas mūsų bibliotekoje esančias knygas")
     st.subheader("Mūsų knygos:")
-    books = lib.all_books()
-    for book in books:
-        st.write(book)
+    books_data = lib.all_books()
+    st.dataframe(books_data, width=800, height=1000)
 
 def show_remove_books():
     st.subheader("Pašalinti knygas")
