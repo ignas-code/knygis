@@ -246,14 +246,16 @@ class Library:
         book_ids = list(self.books.keys()) # Cannot iterate over a dictionary, which changes its size otherwise
         for book_id in book_ids:
             book_year = self.books[book_id].year
+            book_borrowed = self.books[book_id].borrowed_cur
             try:
                 book_year = int(book_year) # make sure the input year is of int type
             except:
                 print("Klaida `rem_ob_1`")
                 return False
-            if book_year < criteria:
+            if book_year < criteria and book_borrowed == 0:
                 removed_book = self.remove_book(book_id)
                 removed_books.append(removed_book)
+
         if removed_books:
             if len(removed_books) == 1:
                 message = "Pašalinta knyga: "
@@ -280,7 +282,10 @@ class Library:
             overdue_book_id_list = self.get_reader_overdue(lib_card)
             if overdue_book_id_list != False:
                 for overdue_book_id in overdue_book_id_list:
-                    late_book = self.books[overdue_book_id]
+                    try:
+                        late_book = self.books[overdue_book_id]
+                    except:
+                        late_book = Book("ištrinta","ištrinta","ištrinta","ištrinta","ištrinta")
                     late_reader = self.readers[lib_card].username
                     all_overdue.append(overdue_book_id)
                     late_readers.append(lib_card)
