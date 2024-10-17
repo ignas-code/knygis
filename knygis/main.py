@@ -1,8 +1,8 @@
 import streamlit as st
 import pandas as pd
-from load_save import initial_load,save
-from initial_data import initial_readers, initial_books
-import settings
+from knygis.functions.load_save import initial_load,save
+from knygis.data.initial_data import initial_readers, initial_books
+import knygis.data.settings as settings
 
 
 def main(lib):

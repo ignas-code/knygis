@@ -1,4 +1,4 @@
-from load_save import save
+from knygis.functions.load_save import save
 
 def book_input():
     print("Įveskite knygos duomenis:")

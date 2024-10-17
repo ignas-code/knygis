@@ -1,8 +1,9 @@
 import os
 import pickle
-from library import Library
+from knygis.classes.library import Library
 
-pickle_file_path = 'knygis/lib.pickle'
+pickle_file_path = 'knygis/data/lib.pickle'
+
 
 def save(lib):
     with open(pickle_file_path, 'wb') as file:

@@ -1,4 +1,4 @@
-from settings import borrow_duration_limit
+from knygis.data.settings import borrow_duration_limit
 from datetime import datetime as dt
 class User:
     def __init__(self,username):

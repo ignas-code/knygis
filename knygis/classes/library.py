@@ -1,9 +1,9 @@
-from books import Book
-from user import Reader, Librarian
+from knygis.classes.books import Book
+from knygis.classes.user import Reader, Librarian
 from datetime import datetime as dt
 from datetime import timedelta
 import random
-import settings
+import knygis.data.settings as settings
 import pandas as pd
 
 class Library:
