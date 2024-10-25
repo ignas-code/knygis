@@ -53,6 +53,23 @@ def create_database(db_file):
     conn.commit()
     conn.close()
 
+def is_book_in_db(title,author,published_year,genre,isbn,db_file): # does not check for total copies
+    """
+    Selects a book entry by its attributes (excluding total_copies) and returns the book_id if it exists.
+    Returns:
+        tuple: A tuple containing the book_id of the matching entry if found, otherwise None.
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''
+    SELECT id from books 
+    WHERE title = ? AND author = ? AND published_year = ? AND genre =? AND isbn = ?
+                    ''',(title,author,published_year,genre,isbn))
+    result = cursor.fetchone()
+    conn.close()
+
+    return result
 
 if __name__ == "__main__":
     create_database(db_file)
+    print(is_book_in_db("abc","d James",'2024','-','-',db_file))
