@@ -1,4 +1,5 @@
 import sqlite3
+import random
 
 db_file = 'knygis/data/library.db'
 
@@ -128,6 +129,27 @@ def all_books():
     conn.close()
     return result
 
+def add_reader(first_name,last_name): # (id, reader_card_number, first_name, last_name)
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO readers (first_name, last_name)
+    VALUES (?,?);
+                    ''',(first_name, last_name))
+    reader_id = cursor.lastrowid
+    lib_card_num = reader_id
+    random_num = random.randint(100,999)
+    lib_card = f'LIB{random_num}{lib_card_num:04}'
+
+    cursor.execute('''
+    UPDATE readers 
+    SET reader_card_number = ?
+    WHERE id = ?;
+                    ''',(lib_card,reader_id))
+    conn.commit()
+    conn.close()
+    return lib_card
+
 if __name__ == "__main__":
     create_database(db_file)
     add_book_to_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002','12',db_file)
@@ -136,3 +158,4 @@ if __name__ == "__main__":
     print(is_book_in_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002',db_file))
     print(increase_book_total_copies(1,1,db_file))
     print(all_books())
+    print(add_reader('Skaitmantas','Knyginis'))
