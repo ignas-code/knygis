@@ -150,6 +150,20 @@ def add_reader(first_name,last_name): # (id, reader_card_number, first_name, las
     conn.close()
     return lib_card
 
+def all_readers():
+    """
+    Retrieves all readers from the database.
+
+    Returns:
+        list of tuples
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT * FROM readers''')
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
 if __name__ == "__main__":
     create_database(db_file)
     add_book_to_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002','12',db_file)
@@ -159,3 +173,4 @@ if __name__ == "__main__":
     print(increase_book_total_copies(1,1,db_file))
     print(all_books())
     print(add_reader('Skaitmantas','Knyginis'))
+    print(all_readers())
