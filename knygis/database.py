@@ -89,7 +89,33 @@ def increase_book_total_copies(book_id,copies_to_add,db_file):
     conn.close()
     return success
 
+def add_book_to_db(title,author,published_year,genre,isbn,total_copies, db_file): # no safety checks
+    book_already_exists = is_book_in_db(title,author,published_year,genre,isbn,db_file)
+    if book_already_exists is None:
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        try:
+            cursor.execute('''
+            INSERT INTO books (title, author, published_year, genre, isbn, total_copies)
+            VALUES (?,?,?,?,?,?);
+                            ''',(title,author,published_year,genre,isbn,total_copies))
+            conn.commit()
+
+        except:
+            print('ISBN not unique')
+            
+        conn.close()
+
+    else:
+        book_id = book_already_exists[0]
+        increase_book_total_copies(book_id,total_copies,db_file)
+        print(f"Such book (ID: {book_id}') already exists, increased `total_copies` number by {total_copies}")
+        pass
+
 if __name__ == "__main__":
     create_database(db_file)
+    add_book_to_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002','12',db_file)
+    add_book_to_db('Think Python','Allen B. Downey','2015','Nonfiction','1491939362',4,db_file)
     print(is_book_in_db("abc","d James",'2024','-','-',db_file))
+    print(is_book_in_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002',db_file))
     print(increase_book_total_copies(1,1,db_file))
