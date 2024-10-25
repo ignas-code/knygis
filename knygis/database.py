@@ -114,6 +114,20 @@ def add_book_to_db(title,author,published_year,genre,isbn,total_copies, db_file)
         else:
             print(f'Unable to increase `total_copies` number for book (ID: {book_id})')
 
+def all_books():
+    """
+    Retrieves all book entries from the database.
+
+    Returns:
+        list of tuples
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT * FROM books''')
+    result = cursor.fetchall()
+    conn.close()
+    return result
+
 if __name__ == "__main__":
     create_database(db_file)
     add_book_to_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002','12',db_file)
@@ -121,3 +135,4 @@ if __name__ == "__main__":
     print(is_book_in_db("abc","d James",'2024','-','-',db_file))
     print(is_book_in_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002',db_file))
     print(increase_book_total_copies(1,1,db_file))
+    print(all_books())
