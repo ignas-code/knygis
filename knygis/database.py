@@ -108,9 +108,11 @@ def add_book_to_db(title,author,published_year,genre,isbn,total_copies, db_file)
 
     else:
         book_id = book_already_exists[0]
-        increase_book_total_copies(book_id,total_copies,db_file)
-        print(f"Such book (ID: {book_id}') already exists, increased `total_copies` number by {total_copies}")
-        pass
+        result = increase_book_total_copies(book_id,total_copies,db_file)
+        if result == True:
+            print(f"Such book (ID: {book_id}') already exists, increased `total_copies` number by {total_copies}")
+        else:
+            print(f'Unable to increase `total_copies` number for book (ID: {book_id})')
 
 if __name__ == "__main__":
     create_database(db_file)
