@@ -70,6 +70,26 @@ def is_book_in_db(title,author,published_year,genre,isbn,db_file): # does not ch
 
     return result
 
+def increase_book_total_copies(book_id,copies_to_add,db_file):
+    """
+    Increases the `total_copies` of a book in the database.
+
+    Returns:
+        bool: True if the update was successful, False otherwise.
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''
+    UPDATE books 
+    SET total_copies = total_copies + ?
+    WHERE id = ?;
+                    ''',(copies_to_add,book_id))
+    conn.commit()
+    success = cursor.rowcount > 0
+    conn.close()
+    return success
+
 if __name__ == "__main__":
     create_database(db_file)
     print(is_book_in_db("abc","d James",'2024','-','-',db_file))
+    print(increase_book_total_copies(1,1,db_file))
