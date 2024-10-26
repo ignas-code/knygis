@@ -220,7 +220,8 @@ def is_book_borrowed_by_reader(book_id,reader_id,db_file):
 def borrow_book(book_id,reader_id,db_file):
     reader_overdue_books = get_reader_overdue(reader_id,db_file)
     available_copies_result = available_copies(book_id,db_file)
-    if reader_overdue_books is None and available_copies_result > 0:
+    currently_borrowed = is_book_borrowed_by_reader(book_id,reader_id,db_file)
+    if reader_overdue_books is None and available_copies_result > 0 and currently_borrowed == False:
         conn = sqlite3.connect(db_file)
         cursor = conn.cursor()
         cursor.execute('''
@@ -232,9 +233,11 @@ def borrow_book(book_id,reader_id,db_file):
         return True
     else:
         if reader_overdue_books:
-            print("User has overdue books")
+            print("Cannot borrow book: Reader has overdue books")
         if available_copies_result == False:
-            print("No available book copies")
+            print("Cannot borrow book: No available copies")
+        if currently_borrowed:
+            print("Cannot borrow book: Reader already has this book borrowed")
         
         return False
 
