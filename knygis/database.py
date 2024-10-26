@@ -181,6 +181,27 @@ def get_reader_overdue(reader_id,db_file):
         return None
     return overdue_book_ids
 
+def available_copies(book_id,db_file):
+    """
+    Returns:
+    int or bool
+        The number of available copies of the book if available,
+        or False if no copies are available.
+
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT total_copies FROM books WHERE id = ?''',(book_id))
+    total_copies = cursor.fetchone()
+    cursor.execute('''SELECT COUNT(*) FROM loans WHERE book_id = ? AND return_date IS NULL''',(book_id))
+    loaned_copies = cursor.fetchone()
+    conn.close()
+    if total_copies != None and loaned_copies is not None:
+        available_copies = total_copies[0] - loaned_copies[0]
+        return available_copies
+    return None
+
+
 def borrow_book(book_id,reader_id,db_file):
     if get_reader_overdue(reader_id,db_file) is None:
         conn = sqlite3.connect(db_file)
@@ -211,3 +232,4 @@ if __name__ == "__main__":
     print(all_readers())
     print(get_reader_overdue('8',db_file))
     borrow_book(3,1,db_file)
+    #print(available_copies('2',db_file))
