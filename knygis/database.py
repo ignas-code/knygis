@@ -201,6 +201,21 @@ def available_copies(book_id,db_file):
         return available_copies
     return None
 
+def is_book_borrowed_by_reader(book_id,reader_id,db_file):
+    """
+    Returns:
+        bool: True if the reader has the book currently borrowed, False otherwise.
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT * FROM loans WHERE book_id = ? AND reader_id = ? AND return_date IS NULL''',(book_id,reader_id))
+    result = cursor.fetchall()
+    conn.close()
+    if len(result) > 0:
+        print("Reader has already borrowed this book")
+        return True
+    else:
+        return False
 
 def borrow_book(book_id,reader_id,db_file):
     reader_overdue_books = get_reader_overdue(reader_id,db_file)
@@ -238,3 +253,4 @@ if __name__ == "__main__":
     print(get_reader_overdue('8',db_file))
     borrow_book(3,1,db_file)
     #print(available_copies('2',db_file))
+    print(is_book_borrowed_by_reader('1','2',db_file))
