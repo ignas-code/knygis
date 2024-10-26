@@ -182,17 +182,20 @@ def get_reader_overdue(reader_id,db_file):
     return overdue_book_ids
 
 def borrow_book(book_id,reader_id,db_file):
-
-    conn = sqlite3.connect(db_file)
-    cursor = conn.cursor()
-    cursor.execute('''
-    INSERT INTO loans (book_id, reader_id)
-    VALUES (?,?);
-                    ''',(book_id, reader_id))
-    reader_id = cursor.lastrowid
-    conn.commit()
-    conn.close()
-    return
+    if get_reader_overdue(reader_id,db_file) is None:
+        conn = sqlite3.connect(db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+        INSERT INTO loans (book_id, reader_id)
+        VALUES (?,?);
+                        ''',(book_id, reader_id))
+        reader_id = cursor.lastrowid
+        conn.commit()
+        conn.close()
+        return True
+    else:
+        print("User has overdue books")
+        return False
 
 
 
@@ -207,3 +210,4 @@ if __name__ == "__main__":
     print(add_reader('Skaitmantas','Knyginis'))
     print(all_readers())
     print(get_reader_overdue('8',db_file))
+    borrow_book(3,1,db_file)
