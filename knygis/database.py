@@ -203,19 +203,24 @@ def available_copies(book_id,db_file):
 
 
 def borrow_book(book_id,reader_id,db_file):
-    if get_reader_overdue(reader_id,db_file) is None:
+    reader_overdue_books = get_reader_overdue(reader_id,db_file)
+    available_copies_result = available_copies(book_id,db_file)
+    if reader_overdue_books is None and available_copies_result > 0:
         conn = sqlite3.connect(db_file)
         cursor = conn.cursor()
         cursor.execute('''
         INSERT INTO loans (book_id, reader_id)
         VALUES (?,?);
                         ''',(book_id, reader_id))
-        reader_id = cursor.lastrowid
         conn.commit()
         conn.close()
         return True
     else:
-        print("User has overdue books")
+        if reader_overdue_books:
+            print("User has overdue books")
+        if available_copies_result == False:
+            print("No available book copies")
+        
         return False
 
 
