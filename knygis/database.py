@@ -164,6 +164,38 @@ def all_readers():
     conn.close()
     return result
 
+def get_reader_overdue(reader_id,db_file):
+    """
+    Returns overdue book ids (in a list) of a specific reader, otherwise returns none.
+    Paramter `loan_period` sets the number of days before a book is considered overdue
+    """
+    loan_period = 14 #days
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT id FROM loans WHERE reader_id = ? AND return_date IS NULL AND DATE('now') > DATE(loan_date, '+' || ? || ' days');''',(reader_id,loan_period))
+    overdue_book_ids = cursor.fetchall() # list of tuples containing book_id
+    conn.close()
+    if overdue_book_ids != None and len(overdue_book_ids) > 0:
+         overdue_book_ids = [id[0] for id in overdue_book_ids] 
+    else:
+        return None
+    return overdue_book_ids
+
+def borrow_book(book_id,reader_id,db_file):
+
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''
+    INSERT INTO loans (book_id, reader_id)
+    VALUES (?,?);
+                    ''',(book_id, reader_id))
+    reader_id = cursor.lastrowid
+    conn.commit()
+    conn.close()
+    return
+
+
+
 if __name__ == "__main__":
     create_database(db_file)
     add_book_to_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002','12',db_file)
@@ -174,3 +206,4 @@ if __name__ == "__main__":
     print(all_books())
     print(add_reader('Skaitmantas','Knyginis'))
     print(all_readers())
+    print(get_reader_overdue('8',db_file))
