@@ -389,21 +389,19 @@ class Library:
         return overdue_book_ids  
     
     def get_all_overdue(self):
-        all_overdue = []
-        late_readers = []
-        for lib_card in self.readers:
-            overdue_book_id_list = self.get_reader_overdue(lib_card)
-            if overdue_book_id_list != False:
-                for overdue_book_id in overdue_book_id_list:
-                    try:
-                        late_book = self.books[overdue_book_id]
-                    except:
-                        late_book = Book("ištrinta","ištrinta","ištrinta","ištrinta","ištrinta")
-                    late_reader = self.readers[lib_card].username
-                    all_overdue.append(overdue_book_id)
-                    late_readers.append(lib_card)
-                    print(f'Skaitytojas: {late_reader}, knyga: {late_book}')
-        return all_overdue, late_readers
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+                        SELECT books.title, books.author, books.isbn, readers.first_name, readers.last_name, readers.reader_card_number, loans.loan_date
+                        FROM loans 
+                        JOIN readers ON loans.reader_id = readers.id
+                        JOIN books ON loans.book_id = books.id
+                        WHERE loans.return_date IS NULL
+                        AND DATE('now') > DATE(loan_date, '+' || 14 || ' days');
+                       ''')
+        overdue_books = cursor.fetchall()
+        conn.close()
+        return overdue_books
     
     def get_borrowed_by_user(self,reader_id):
         """

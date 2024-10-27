@@ -263,19 +263,13 @@ def show_all_readers():
 
 def show_late_books():
     st.subheader("Vėluojančios knygos")
-
-    all_overdue, late_readers = lib.get_all_overdue()
-    st.write("**Vėluojančios knygos:**")
-    if all_overdue:
-        for book in all_overdue:
-            try:
-                st.write(f'{lib.books[book]}')
-            except:
-                st.write(f'Knyga ištrinta, bet vartotojo negrąžinta')
-    st.write("**Vėluojantys grąžinti skaitytojai:**")
-    if late_readers:
-        for reader in late_readers:
-            st.write(f'Skaitytojo kortelė {reader}, Vartotojo vardas: {lib.readers[reader].username}')
+    st.write("Čia pateikiamas sąrašas vėluojamų grąžinti knygų, nurodant kiekvienos jų skaitytojo vardą, pavardę, kortelės numerį ir knygos paėmimo datą.")
+    overdue_books = lib.get_all_overdue()
+    if overdue_books:
+        df = pd.DataFrame(overdue_books,columns=['Pavadinimas','Autorius','ISBN','Vardas','Pavardė','Skait. kortelės nr.', 'Paėmimo data'])
+        st.dataframe(df,hide_index=True)
+    else:
+        st.success("Vėluojančių knygų nėra.")
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
