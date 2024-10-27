@@ -252,29 +252,25 @@ class Library:
         else:
             print("Nepakankamas likutis")
             return "Nepakankamas likutis"
-    
-    
-    def return_book(self,book_id,lib_card):
-        return_date = dt.now().date().strftime("%Y-%m-%d")
-        try:
-            book = self.books[book_id]
-        except:
-            print("Knyga nerasta")
-            return "Knyga nerasta"
-        try:
-            reader = self.readers[lib_card]
-        except:
-            print("Skaitytojas nerastas")
-            return "Skaitytojas nerastas"
-        if book_id in reader.books_borrowed:
-            reader.books_borrowed[book_id][1] = return_date # {bookd_id: [borrow_date, return_date]}
-            book.borrowed_cur -= 1
-            print(f'Knyga "{book.name}" sėkmingai grąžinta ({return_date})')
-            return f'Knyga "{book.name}" sėkmingai grąžinta ({return_date})'
-        else:
-            print(f"Tokios knygos skaitytojas {reader.username} nebuvo paėmęs")
-            return f"Tokios knygos skaitytojas **'{reader.username}'** nebuvo paėmęs"
         
+    def return_book(self,book_id,reader_id):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''UPDATE loans SET return_date = CURRENT_TIMESTAMP WHERE book_id = ? AND reader_id = ? AND return_date IS NULL''',(book_id,reader_id))
+        conn.commit()
+        result = cursor.rowcount
+        conn.close()
+        if result < 1:
+            print("No such unreturned book found")
+            return "No such unreturned book found"
+        if result == 1:
+            print("Book returned succesfully")
+            return True
+        if result > 1:
+            print("More than one copy of this book was borrowed, books returned succesfully")
+            print(result)
+            return result
+
     def add_reader(self,first_name,last_name): # (id, reader_card_number, first_name, last_name)
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
@@ -437,20 +433,25 @@ class Library:
             book_author = self.books[book_id].author
             borrowed_list.append(f'ID: {book_id} Knyga: **{book_name}**, autorius: **{book_author}**, paimta: **{borrow_date}**, grąžinta: **{return_date}**')
         return borrowed_list
-    
-    def get_currently_borrowed_by_user(self,lib_card):
-        borrowed_dict = {}
-        reader = self.readers[lib_card]
-        borrowed_books = reader.view_borrowed()
-        for book_id, dates in borrowed_books.items():
-            borrow_date = dates[0]
-            return_date = dates[1]
-            if return_date == 0:
-                book_name = self.books[book_id].name
-                book_author = self.books[book_id].author
-                borrowed_dict[book_id] = f'ID: {book_id} Knyga: {book_name}, autorius: {book_author}, paimta: {borrow_date}'
-            
-        return borrowed_dict
+
+    def get_currently_borrowed_by_user(self,reader_id):
+        """
+        Retrieves all books (title and author) currently borrowed by the reader. Used for book return selector.
+
+        Returns:
+            list of tuples
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT book_id FROM loans WHERE reader_id = ? AND return_date IS NULL''',(reader_id))
+        book_ids = cursor.fetchall()
+        book_titles_authors = []
+        for book_id in book_ids:
+            cursor.execute('''SELECT id, title, author FROM books WHERE id = ?''',(str(book_id[0])))
+            result = cursor.fetchone()
+            book_titles_authors.append(result)
+        conn.close()
+        return book_titles_authors
 
 # methods migrated to sql
     def get_reader(self,first_name,last_name,reader_card_number):
