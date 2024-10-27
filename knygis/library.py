@@ -379,7 +379,7 @@ class Library:
         loan_period = 14 #days
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
-        cursor.execute('''SELECT id FROM loans WHERE reader_id = ? AND return_date IS NULL AND DATE('now') > DATE(loan_date, '+' || ? || ' days');''',(reader_id,loan_period))
+        cursor.execute('''SELECT book_id FROM loans WHERE reader_id = ? AND return_date IS NULL AND DATE('now') > DATE(loan_date, '+' || ? || ' days');''',(reader_id,loan_period))
         overdue_book_ids = cursor.fetchall() # list of tuples containing book_id
         conn.close()
         if overdue_book_ids != None and len(overdue_book_ids) > 0:
