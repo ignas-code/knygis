@@ -41,7 +41,7 @@ class Library:
         cursor = conn.cursor()
         cursor.execute('''
         SELECT id from books 
-        WHERE title = ? AND author = ? AND published_year = ? AND genre =? AND isbn = ?
+        WHERE title = ? AND author = ? AND published_year = ? AND genre =? AND isbn = ? AND is_deleted IS 0
                         ''',(title,author,published_year,genre,isbn))
         result = cursor.fetchone()
         conn.close()
@@ -79,8 +79,10 @@ class Library:
                                 ''',(title,author,published_year,genre,isbn,total_copies))
                 conn.commit()
 
+            except sqlite3.IntegrityError:
+                 return ('ISBN not unique')
             except:
-                print('ISBN not unique')
+                return
                 
             conn.close()
             return 'Book added successfully'

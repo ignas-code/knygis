@@ -154,6 +154,10 @@ def show_add_book():
                     st.success(f"Knyga **{title}** jau yra bibliotekoje! Papildomai pridėta vienetų: **{total_copies}**.")
                 elif result == 'Book already exists. Adding additioanl copies failed.':
                     st.error(f"Knyga **{title}** jau yra bibliotekoje! Pridėti papildomų vienetų nepavyko.")
+                elif result == 'ISBN not unique':
+                    st.error(f'Knyga su tokiu ISBN {isbn} jau egzistuoja. Patikrinkite prie ištrintų')
+                else:
+                    st.error(f'Nežinoma klaida **SAB1**')
 
                 #st.session_state['last_added_book'] = name 
             else:
