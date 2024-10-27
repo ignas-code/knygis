@@ -19,18 +19,78 @@ class Library:
         self.initialized_data = False
         self.db_file = 'knygis/data/library.db'
 
-    def add_book(self,name,author,year,genre,quantity):
-        if quantity > 0:
-            new_book = Book(name,author,year,genre,quantity)
-            for id, existing_book in self.books.items():
-                if existing_book == new_book:
-                    current_quantity = existing_book.quantity
-                    new_quantity = current_quantity + quantity
-                    existing_book.quantity = new_quantity
-                    return
+    # def add_book(self,name,author,year,genre,quantity):
+    #     if quantity > 0:
+    #         new_book = Book(name,author,year,genre,quantity)
+    #         for id, existing_book in self.books.items():
+    #             if existing_book == new_book:
+    #                 current_quantity = existing_book.quantity
+    #                 new_quantity = current_quantity + quantity
+    #                 existing_book.quantity = new_quantity
+    #                 return
             
-            self.books[self.bookid] = new_book
-            self.bookid += 1
+    #         self.books[self.bookid] = new_book
+    #         self.bookid += 1
+    def is_book_in_db(self,title,author,published_year,genre,isbn): # does not check for total copies
+        """
+        Selects a book entry by its attributes (excluding total_copies) and returns the book_id if it exists.
+        Returns:
+            tuple: A tuple containing the book_id of the matching entry if found, otherwise None.
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+        SELECT id from books 
+        WHERE title = ? AND author = ? AND published_year = ? AND genre =? AND isbn = ?
+                        ''',(title,author,published_year,genre,isbn))
+        result = cursor.fetchone()
+        conn.close()
+
+        return result
+
+    def increase_book_total_copies(self,book_id,copies_to_add):
+        """
+        Increases the `total_copies` of a book in the database.
+
+        Returns:
+            bool: True if the update was successful, False otherwise.
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+        UPDATE books 
+        SET total_copies = total_copies + ?
+        WHERE id = ?;
+                        ''',(copies_to_add,book_id))
+        conn.commit()
+        success = cursor.rowcount > 0
+        conn.close()
+        return success
+
+    def add_book(self,title,author,published_year,genre,isbn,total_copies):
+        book_already_exists = self.is_book_in_db(title,author,published_year,genre,isbn)
+        if book_already_exists is None:
+            conn = sqlite3.connect(self.db_file)
+            cursor = conn.cursor()
+            try:
+                cursor.execute('''
+                INSERT INTO books (title, author, published_year, genre, isbn, total_copies)
+                VALUES (?,?,?,?,?,?);
+                                ''',(title,author,published_year,genre,isbn,total_copies))
+                conn.commit()
+
+            except:
+                print('ISBN not unique')
+                
+            conn.close()
+
+        else:
+            book_id = book_already_exists[0]
+            result = self.increase_book_total_copies(book_id,total_copies)
+            if result == True:
+                print(f"Such book (ID: {book_id}') already exists, increased `total_copies` number by {total_copies}")
+            else:
+                print(f'Unable to increase `total_copies` number for book (ID: {book_id})')
 
     def all_books(self):
         """
