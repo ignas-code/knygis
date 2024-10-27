@@ -282,10 +282,12 @@ def return_book(book_id,reader_id,db_file):
 
 def get_reader(first_name,last_name,reader_card_number,db_file):
     """
-    Docstring.
+    Retrieves the ID of a registered reader from the database based on the provided details.
 
     Returns:
-        list of tuples
+        int: The unique ID of the reader if found.
+        bool: False if no reader is found matching the provided details.
+
     """
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
