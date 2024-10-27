@@ -280,6 +280,30 @@ def return_book(book_id,reader_id,db_file):
     print(result)
     return result
 
+def get_reader(first_name,last_name,reader_card_number,db_file):
+    """
+    Docstring.
+
+    Returns:
+        list of tuples
+    """
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''SELECT id FROM readers WHERE first_name = ? AND last_name = ? AND reader_card_number = ?''',(first_name,last_name,reader_card_number))
+    result = cursor.fetchall()
+    conn.close()
+    if len(result) == 0:
+        print("Reader not found")
+        return False
+    if len(result) == 1:
+        print("Reader found")
+        return result[0][0]
+    if len(result) > 1:
+        print('Error, duplicate users found. Please contact admin')
+        return False
+
+    return result
+
 if __name__ == "__main__":
     create_database(db_file)
     add_book_to_db("Chip War","Chris Miller",'2024','Nonfiction','3322111982172002','12',db_file)
@@ -297,3 +321,5 @@ if __name__ == "__main__":
     print(get_borrowed_count_by_reader('4',db_file))
     return_book('4','4',db_file)
     print(get_borrowed_count_by_reader('4',db_file))
+    print(get_reader('Skaitmantas','Knyginis','LIB8080001',db_file))
+    print(get_reader('Raidvardas','Puslapiauskas','LIB5410004',db_file))
