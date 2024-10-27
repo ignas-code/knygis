@@ -279,17 +279,27 @@ def show_late_books():
 
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
-    book_id = st.number_input("Įveskite norimos knygos ID:",min_value=0,step=1)
-    try:
-        book_name = lib.books[book_id].name
-        book_author = lib.books[book_id].author
-        st.write(f'Knyga: {book_name}, Autorius: {book_author}')
+    book_id = st.number_input("Įveskite norimos knygos ID:",min_value=1,step=1)
+    # try:
+    book_name,book_author = lib.get_title_author(str(book_id))
+    if book_name != False and book_author != False:
+        st.write(f'Knyga: **{book_name}**, Autorius: **{book_author}**')
         if st.button("Pasiimti"):
-            result = lib.borrow_book(book_id, st.session_state.reader_card_number)
-            st.write(result)
-            save(lib)
-    except KeyError:
+            result = lib.borrow_book(str(book_id), str(st.session_state.reader_id))
+            if result == True:
+                st.success(f"Knyga **{book_name}** sėkmingai paimta!")
+            if result == "Reader has overdue books":
+                st.error("Jūs turite vėluojančių knygų!")
+            elif result == "No available copies":
+                st.error("Nepakankamas knygų likutis!")
+            elif result == "Reader already has this book borrowed":
+                st.error("Jūs jau turite šią knygą!")
+            elif result == "Reader already has maximum number of books borrowed":
+                st.error("Jūs jau turite paėmę maksimalų leistiną kiekį knygų!")
+    else:
         st.error("Knyga neegzistuoja")
+    # except KeyError:
+    #     st.error("Knyga neegzistuoja (KeyError)")
         
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
