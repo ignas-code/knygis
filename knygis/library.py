@@ -19,18 +19,6 @@ class Library:
         self.initialized_data = False
         self.db_file = 'knygis/data/library.db'
 
-    # def add_book(self,name,author,year,genre,quantity):
-    #     if quantity > 0:
-    #         new_book = Book(name,author,year,genre,quantity)
-    #         for id, existing_book in self.books.items():
-    #             if existing_book == new_book:
-    #                 current_quantity = existing_book.quantity
-    #                 new_quantity = current_quantity + quantity
-    #                 existing_book.quantity = new_quantity
-    #                 return
-            
-    #         self.books[self.bookid] = new_book
-    #         self.bookid += 1
     def is_book_in_db(self,title,author,published_year,genre,isbn): # does not check for total copies
         """
         Selects a book entry by its attributes (excluding total_copies) and returns the book_id if it exists.
@@ -474,7 +462,6 @@ class Library:
         conn.close()
         return book_titles_authors
 
-# methods migrated to sql
     def get_reader(self,first_name,last_name,reader_card_number):
         """
         Retrieves the ID of a registered reader from the database based on the provided details.
