@@ -341,22 +341,25 @@ def show_find_books():
     if search_option == "Ieškoti pagal pavadinimą":
         book_name = st.text_input("Įveskite knygos pavadinimą:")
         if book_name:
-            results = lib.find_books_by_name(book_name)
-            if isinstance(results, dict):
-                for book_id, book in results.items():
-                    st.write(f'ID:{book_id}, Knyga: {book.name}, Autorius: {book.author}, Metai: {book.year}, Žanras: {book.genre}')
+            result = lib.find_books_by_name(book_name)
+            if result:
+                column_names = ['id', 'Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai']
+                df = pd.DataFrame(result, columns=column_names)
+                st.dataframe(df, hide_index=True, use_container_width=True)
             else:
-                st.write(results)
+                st.error(f"Knygų pavadinimų su **'{book_name}'** nerasta")
+        
             
     elif search_option == "Ieškoti pagal autorių":
         author_name = st.text_input("Įveskite autoriaus vardą:")
         if author_name:
-            results = lib.find_books_by_author(author_name)
-            if isinstance(results, dict):
-                for book_id, book in results.items():
-                    st.write(f'ID:{book_id}, Knyga: {book.name}, Autorius: {book.author}, Metai: {book.year}, Žanras: {book.genre}')
+            result = lib.find_books_by_author(author_name)
+            if result:
+                column_names = ['id', 'Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai']
+                df = pd.DataFrame(result, columns=column_names)
+                st.dataframe(df, hide_index=True, use_container_width=True)
             else:
-                st.write(results)
+                st.error(f"Knygų su autoriumi **'{author_name}'** nerasta")
 
 def show_initialize_data():
     st.subheader("Inicializuoti duomenis")

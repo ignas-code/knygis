@@ -293,38 +293,23 @@ class Library:
         return reader_card_number
     
     def find_books_by_name(self,book_name):
-        found_books = []
-        found_books_dict = {}
-        for book_id in self.books:
-            name = self.books[book_id].name
-            if book_name.lower() in name.lower():
-                found_books.append(self.books[book_id])
-                found_books_dict[book_id] = self.books[book_id]
-        
-        if found_books:
-            for book in found_books:
-                print(book)
-        else:
-            print(f'Knygų su pavadinimu "{book_name}" nerasta')
-            return f'Knygų su pavadinimu "{book_name}" nerasta'
-        return found_books_dict
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id,title,author,published_year,genre,isbn,total_copies FROM books WHERE title LIKE '%' || ? || '%' AND is_deleted IS 0''',(book_name,))
+        result = cursor.fetchall()
+        conn.close()
+
+        return result
+
 
     def find_books_by_author(self,book_author):
-        found_books = []
-        found_books_dict = {}
-        for book_id in self.books:
-            author = self.books[book_id].author
-            if book_author.lower() in author.lower():
-                found_books.append(self.books[book_id])
-                found_books_dict[book_id] = self.books[book_id]
-        
-        if found_books:
-            for book in found_books:
-                print(book)
-        else:
-            print(f'Knygų su autoriumi "{book_author}" nerasta')
-            return f'Knygų su autoriumi "{book_author}" nerasta'
-        return found_books_dict
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id,title,author,published_year,genre,isbn,total_copies FROM books WHERE author LIKE '%' || ? || '%' AND is_deleted IS 0''',(book_author,))
+        result = cursor.fetchall()
+        conn.close()
+
+        return result
     
     def remove_book(self,bookid): #be careful, no safety checks at all
         try:
