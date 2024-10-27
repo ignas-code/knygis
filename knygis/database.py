@@ -262,7 +262,23 @@ def borrow_book(book_id,reader_id,db_file):
             print(f"Cannot borrow book: Reader already has maximum number of books ({max_borrowed_books}) borrowed")
         return False
 
-
+def return_book(book_id,reader_id,db_file):
+    conn = sqlite3.connect(db_file)
+    cursor = conn.cursor()
+    cursor.execute('''UPDATE loans SET return_date = CURRENT_TIMESTAMP WHERE book_id = ? AND reader_id = ? AND return_date IS NULL''',(book_id,reader_id))
+    result = cursor.fetchall()
+    conn.commit()
+    conn.close()
+    if len(result) < 1:
+        print("No such unreturned book found")
+        return False
+    if len(result) == 1:
+        print("Book returned succesfully")
+        return True
+    if len(result) > 1:
+        print("More than one copy of this book was borrowed, books returned succesfully")
+    print(result)
+    return result
 
 if __name__ == "__main__":
     create_database(db_file)
@@ -278,4 +294,6 @@ if __name__ == "__main__":
     borrow_book(3,1,db_file)
     #print(available_copies('2',db_file))
     print(is_book_borrowed_by_reader('1','2',db_file))
-    print(get_borrowed_count_by_reader('1',db_file))
+    print(get_borrowed_count_by_reader('4',db_file))
+    return_book('4','4',db_file)
+    print(get_borrowed_count_by_reader('4',db_file))
