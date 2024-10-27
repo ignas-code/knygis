@@ -33,33 +33,21 @@ class Library:
             self.bookid += 1
 
     def all_books(self):
-        ids = []
-        names = []
-        authors = []
-        years = []
-        genres = []
-        quantities = []
-        borrowed = []
-        for book_id, book in self.books.items():
-            ids.append(book_id)
-            names.append(book.name)
-            authors.append(book.author)
-            years.append(book.year)
-            genres.append(book.genre)
-            quantities.append(book.quantity)
-            borrowed.append(book.borrowed_cur)
+        """
+        Retrieves all book entries from the database.
 
-        data = {
-        'ID': ids,
-        'Pavadinimas': names,
-        'Autorius': authors,
-        'Metai': years,
-        'Žanras': genres,
-        'Kiekis': quantities,
-        'Paimta': borrowed
-        }
+        Returns:
+            list of tuples
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id,title,author,published_year,genre,isbn,total_copies FROM books''')
+        result = cursor.fetchall()
+        conn.close()
+        column_names = ['id', 'Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai']
+        df = pd.DataFrame(result, columns=column_names)
 
-        df = pd.DataFrame(data)
+        print(df)
         return df
 
     def all_readers(self):
