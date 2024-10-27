@@ -5,6 +5,9 @@ from datetime import timedelta
 import random
 import settings
 import pandas as pd
+import sqlite3
+import random
+
 
 class Library:
     def __init__(self):
@@ -14,6 +17,7 @@ class Library:
         self.lib_card_num = 0
         self.librarian = Librarian(settings.librarian_username,settings.librarian_password)
         self.initialized_data = False
+        self.db_file = 'knygis/data/library.db'
 
     def add_book(self,name,author,year,genre,quantity):
         if quantity > 0:
@@ -317,6 +321,33 @@ class Library:
                 borrowed_dict[book_id] = f'ID: {book_id} Knyga: {book_name}, autorius: {book_author}, paimta: {borrow_date}'
             
         return borrowed_dict
+
+# methods migrated to sql
+    def get_reader(self,first_name,last_name,reader_card_number):
+        """
+        Retrieves the ID of a registered reader from the database based on the provided details.
+
+        Returns:
+            int: The unique ID of the reader if found.
+            bool: False if no reader is found matching the provided details.
+
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id FROM readers WHERE first_name = ? AND last_name = ? AND reader_card_number = ?''',(first_name,last_name,reader_card_number))
+        result = cursor.fetchall()
+        conn.close()
+        if len(result) == 0:
+            print("Reader not found")
+            return False
+        if len(result) == 1:
+            print("Reader found")
+            return result[0][0]
+        if len(result) > 1:
+            print('Error, duplicate users found. Please contact admin')
+            return False
+
+        return result
 
 if __name__ == "__main__":
     # for testing purposes only
