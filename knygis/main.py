@@ -125,38 +125,36 @@ def show_home():
 
 def show_add_book():
     st.subheader("Pridėti knygą")
-    max_chars = settings.max_chars
+    char_limit = settings.max_chars
+    isbn_char_limit = 13
     st.write("Užpildykite laukelius ir pridėkite norimą knygą. " \
              "Jei tokia knyga jau egzistuoja, **bus papildytas jos kiekis**. "\
-             f"Laukelio įvesties ilgis iki {max_chars} simbolių. ")
+             f"Laukelio įvesties ilgis iki {char_limit} simbolių, ISBN iki {isbn_char_limit} simbolių.")
 
 
     with st.form(key='add_book_form',clear_on_submit=True):
-        name = st.text_input("Įveskite knygos pavadinimą:")
-        author = st.text_input("Įveskite autorių:")
-        year = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=2000)
-        genre = st.text_input("Įveskite žanrą:")
-        quantity = st.number_input("Įveskite kiekį:", min_value=1, max_value=200, step=1)
+        title = st.text_input("Įveskite knygos pavadinimą:", max_chars=char_limit)
+        author = st.text_input("Įveskite autorių:",max_chars=char_limit)
+        published_year = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=2000)
+        genre = st.text_input("Įveskite žanrą:",max_chars=char_limit)
+        isbn = st.text_input("Įveskite ISBN:",max_chars=isbn_char_limit,help='10 arba 13 simbolių ISBN kodas')
+        total_copies = st.number_input("Įveskite kiekį:",min_value = 1, max_value=200, step=1,help='Nurodžius 0 arba neigiamą kiekį, bus pridėta 1 kynga')
         #quantity = st.slider("Pasirinkite kiekį:", min_value=1, max_value=200, value=10, step=1)
     
         submit_button = st.form_submit_button("Pridėti")
 
-        
-        if len(name) >= max_chars:
-            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
-            name = name[:max_chars]
-        if len(author) >= max_chars:
-            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
-            author = author[:max_chars]
-        if len(genre) >= max_chars:
-            st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
-            genre = genre[:max_chars]
 
         if submit_button:
-            if name and author and genre:
-                lib.add_book(name,author,year,genre,quantity)
-                save(lib)
-                st.success(f"Knyga '{name}' pridėta sėkmingai!")
+
+            if title and author and genre and isbn:
+                result = lib.add_book(title,author,published_year,genre,isbn,total_copies)
+                if result == 'Book added successfully':
+                    st.success(f"Knyga **{title}** pridėta sėkmingai!")
+                elif result == 'Book already exists. Added additional copies.':
+                    st.success(f"Knyga **{title}** jau yra bibliotekoje! Papildomai pridėta vienetų: **{total_copies}**.")
+                elif result == 'Book already exists. Adding additioanl copies failed.':
+                    st.error(f"Knyga **{title}** jau yra bibliotekoje! Pridėti papildomų vienetų nepavyko.")
+
                 #st.session_state['last_added_book'] = name 
             else:
                 st.error("Įvesti ne visi laukai")
