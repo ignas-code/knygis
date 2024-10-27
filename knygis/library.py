@@ -127,43 +127,92 @@ class Library:
         conn.close()
         return result
 
-    def borrow_book(self,book_id,lib_card):
-        current_date = dt.now().date().strftime("%Y-%m-%d")
-        return_date = 0
-        try:
-            book = self.books[book_id]
-        except:
-            print("Knyga nerasta")
-            return "Knyga nerasta"
-        try:
-            reader = self.readers[lib_card]
-        except:
-            print("Skaitytojas nerastas")
-            return "Skaitytojas nerastas"
-        users_overdue_books = self.get_reader_overdue(lib_card)
-        if users_overdue_books:
-            print("Turite knygų negražintų laiku: ")
-            for book_id in users_overdue_books:
-                print(self.books[book_id].name,self.books[book_id].author)
-            print("Pirmiausia grąžinkite vėluojančias knygas!")
-            return "Pirmiausia grąžinkite vėluojančias knygas!"
-        if book.quantity > book.borrowed_cur:
-            try:
-                borrowed_before = bool(reader.books_borrowed[book_id][1]) # check if book return date is present
-            except (KeyError, IndexError):
-                borrowed_before = False
-            if book_id not in reader.books_borrowed or borrowed_before: # test if book was borrowed previously
-                reader.books_borrowed[book_id] = [current_date, return_date] # if book is taken 2nd time, record will be rewritten
-                book.borrowed_cur += 1
-                print(f'Knyga "{book.name}" sėkmingai paimta ({current_date})')
-                return f'Knyga "{book.name}" sėkmingai paimta ({current_date})'
-            else:
-                print("Knyga jau paimta")
-                return "Knyga jau paimta"
+    def available_copies(self,book_id):
+        """
+        Returns:
+        int or bool
+            The number of available copies of the book if available,
+            or False if no copies are available.
+
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT total_copies FROM books WHERE id = ?''',(book_id))
+        total_copies = cursor.fetchone()
+        cursor.execute('''SELECT COUNT(*) FROM loans WHERE book_id = ? AND return_date IS NULL''',(book_id))
+        loaned_copies = cursor.fetchone()
+        conn.close()
+        if total_copies != None and loaned_copies is not None:
+            available_copies = total_copies[0] - loaned_copies[0]
+            return available_copies
+        return None
+
+    def is_book_borrowed_by_reader(self,book_id,reader_id):
+        """
+        Returns:
+            bool: True if the reader has the book currently borrowed, False otherwise.
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT * FROM loans WHERE book_id = ? AND reader_id = ? AND return_date IS NULL''',(book_id,reader_id))
+        result = cursor.fetchall()
+        conn.close()
+        if len(result) > 0:
+            return True
         else:
-            print("Nepakankamas likutis")
-            return "Nepakankamas likutis"
-    
+            return False
+
+    def get_borrowed_count_by_reader(self,reader_id):
+        """
+        Retrieves a number of books currently borrowed by the reader.
+
+        Returns:
+            int
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT COUNT(*) FROM loans WHERE reader_id = ? AND return_date IS NULL''',(reader_id))
+        result = cursor.fetchone()
+        conn.close()
+        return result[0]
+
+    def borrow_book(self,book_id,reader_id):
+        print('function sstart')
+        max_borrowed_books = 3
+        reader_overdue_books = self.get_reader_overdue(reader_id)
+        available_copies_result = self.available_copies(book_id)
+        currently_borrowed = self.is_book_borrowed_by_reader(book_id,reader_id)
+        borrowed_count = self.get_borrowed_count_by_reader(reader_id)
+        if (
+            reader_overdue_books is None 
+            and available_copies_result > 0 
+            and currently_borrowed == False 
+            and borrowed_count < max_borrowed_books
+            ):
+            conn = sqlite3.connect(self.db_file)
+            cursor = conn.cursor()
+            cursor.execute('''
+            INSERT INTO loans (book_id, reader_id)
+            VALUES (?,?);
+                            ''',(book_id, reader_id))
+            conn.commit()
+            conn.close()
+            return True
+        else: # possible improvement here could be using if clauses and returning all applicable error messages
+            if reader_overdue_books:
+                print("Cannot borrow book: Reader has overdue books")
+                return "Reader has overdue books"
+            elif currently_borrowed:
+                print("Cannot borrow book: Reader already has this book borrowed")
+                return "Reader already has this book borrowed"
+            elif borrowed_count >= max_borrowed_books:
+                print(f"Cannot borrow book: Reader already has maximum number of books ({max_borrowed_books}) borrowed")
+                return "Reader already has maximum number of books borrowed"
+            elif available_copies_result == False:
+                print("Cannot borrow book: No available copies")
+                return "No available copies"
+            return False
+
     def borrow_late_book(self,book_id,lib_card):
         "Dev use only. Changes the borrowing date to -15 days"
         current_date = dt.now().date()
@@ -341,11 +390,22 @@ class Library:
             print("Nėra pašalintų knygų")
             return False
         
-    def get_reader_overdue(self,lib_card):
-        "Returns overdue book ids of a specific reader"
-        reader = self.readers[lib_card]
-        overdue_book_ids = reader.get_overdue()
-        return overdue_book_ids
+    def get_reader_overdue(self,reader_id):
+        """
+        Returns overdue book ids (in a list) of a specific reader, otherwise returns none.
+        Paramter `loan_period` sets the number of days before a book is considered overdue
+        """
+        loan_period = 14 #days
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id FROM loans WHERE reader_id = ? AND return_date IS NULL AND DATE('now') > DATE(loan_date, '+' || ? || ' days');''',(reader_id,loan_period))
+        overdue_book_ids = cursor.fetchall() # list of tuples containing book_id
+        conn.close()
+        if overdue_book_ids != None and len(overdue_book_ids) > 0:
+            overdue_book_ids = [id[0] for id in overdue_book_ids] 
+        else:
+            return None
+        return overdue_book_ids  
     
     def get_all_overdue(self):
         all_overdue = []
@@ -418,6 +478,19 @@ class Library:
             return False
 
         return result
+
+    def get_title_author(self,book_id):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT title FROM books WHERE id = ?''',(book_id))
+        title = cursor.fetchone()
+        cursor.execute('''SELECT author FROM books WHERE id = ?''',(book_id))
+        author = cursor.fetchone()
+        conn.close()
+        if title is not None and author is not None:
+            return title[0],author[0]
+        else:
+            return False,False
 
 if __name__ == "__main__":
     # for testing purposes only
