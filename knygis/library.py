@@ -83,14 +83,17 @@ class Library:
                 print('ISBN not unique')
                 
             conn.close()
+            return 'Book added successfully'
 
         else:
             book_id = book_already_exists[0]
             result = self.increase_book_total_copies(book_id,total_copies)
             if result == True:
                 print(f"Such book (ID: {book_id}') already exists, increased `total_copies` number by {total_copies}")
+                return 'Book already exists. Added additional copies.'
             else:
                 print(f'Unable to increase `total_copies` number for book (ID: {book_id})')
+                return 'Book already exists. Adding additioanl copies failed.'
 
     def all_books(self):
         """
