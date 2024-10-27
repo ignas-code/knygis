@@ -318,15 +318,17 @@ def show_borrowed_by_user():
 def show_return_book():
     st.subheader("Grąžinti knygą")
     
-    borrowed_books_dict = lib.get_currently_borrowed_by_user(st.session_state.reader_card_number) # Returns a list of tuples (book_title, book_id)
-
-    if borrowed_books_dict:
-        book_options = [(title, book_id) for book_id, title in borrowed_books_dict.items()]
-        selected_book_title, selected_book_id = st.selectbox("Pasirinkite norimą grąžinti knygą:", book_options, format_func=lambda x: x[0])  # Lambda to only display the title
+    borrowed_books = lib.get_currently_borrowed_by_user(str(st.session_state.reader_id)) # Returns a list of tuples (book_title, book_id)
+    if borrowed_books:
+        selected_book_id, selected_book_title, selected_book_author  = st.selectbox("Pasirinkite norimą grąžinti knygą:", borrowed_books, format_func=lambda x: f"{x[1]}, {x[2]}")  # Lambda to only display the title
         if st.button("Grąžinti"):
-                response = lib.return_book(selected_book_id,st.session_state.reader_card_number)
-                st.write(response)
-                save(lib)
+                response = lib.return_book(selected_book_id,st.session_state.reader_id)
+                if response == True:
+                    st.success(f'Knyga **{selected_book_title}** sėkmingai grąžinta!')
+                elif response == False:
+                    st.error(f"Tokios knygos skaitytojas **{st.session_state.reader_id}** nebuvo paėmęs")
+                else:
+                    st.error("Daugiau nei viena šios knygos kopija buvo paimta. Visos paimtos knygos kopijos grąžintos.")
     else:
         st.write("Šiuo metu neturite paėmę knygų")
 
