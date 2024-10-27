@@ -257,7 +257,7 @@ def show_all_readers():
     all_readers = lib.all_readers()
     df = pd.DataFrame(all_readers, columns=["ID","Skait. kortelė",'Vardas',"Pavardė",'Pridėjimo data'])
     if all_readers:
-        st.table(df)
+        st.dataframe(df,use_container_width=True)
     else:
         st.write("Skaitytojų nėra")
 
