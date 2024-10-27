@@ -3,7 +3,7 @@ import pandas as pd
 from load_save import initial_load,save
 from initial_data import initial_readers, initial_books
 import settings
-
+from library import Library
 
 def main(lib):
     st.title("Biblioteka")
@@ -16,17 +16,20 @@ def main(lib):
     if not st.session_state.logged_in:
         page_option = st.sidebar.radio("Pasirinkite", ["Skaitytojo puslapis", "Bibliotekininko puslapis"])
         if page_option == "Skaitytojo puslapis":
-            lib_card = st.text_input("Įveskite savo skaitytojo kortelės numerį:")
-            if st.button("Prisijungti") or lib_card:
-                if lib_card in lib.readers:
-                    reader = lib.readers[lib_card]
-                    username = reader.username
+            reader_first_name = st.text_input("Įveskite skaitytojo vardą:")
+            reader_last_name = st.text_input("Įveskite skaitytojo pavardę:")
+            reader_card_number = st.text_input("Įveskite skaitytojo kortelės numerį:")
+            if st.button("Prisijungti") or reader_card_number:
+                reader_id = lib.get_reader(reader_first_name,reader_last_name,reader_card_number)
+                if reader_id:
                     st.session_state.logged_in = True
-                    st.session_state.lib_card = lib_card
+                    st.session_state.reader_card_number = reader_card_number
+                    st.session_state.reader_id = reader_id
                     st.session_state.user = 'reader' 
-                    st.session_state.username = username
-                    st.success(f"Sveiki prisijungę, {username} !")
-                    print(f'Sveiki prisijungę, {username} !')
+                    st.session_state.first_name = reader_first_name
+                    st.session_state.last_name = reader_last_name
+                    st.success(f"Sveiki prisijungę, {reader_first_name} {reader_last_name} !")
+                    print(f'Sveiki prisijungę, {reader_first_name} {reader_last_name} !')
                     st.rerun()
                 else:
                     st.error("Klaidinga įvestis. Prašome įvesti skaitytojo kortelės numerį.")
@@ -37,7 +40,7 @@ def main(lib):
             if st.button("Prisijungti") or librarian_password:
                 if librarian_username == lib.librarian.username and librarian_password == lib.librarian.password: 
                     st.session_state.logged_in = True
-                    st.session_state.lib_card = None
+                    st.session_state.reader_card_number = None
                     st.session_state.user = 'librarian'
                     st.session_state.username = librarian_username
                     st.success(f"Sveiki prisijungę, {librarian_username} !")
@@ -104,12 +107,21 @@ def librarian_navigation(lib):
         show_log_out()
 
 def show_home():
-    st.subheader("Pagrindinis")
-    username = st.session_state.username
-    st.write(f"Sveiki prisijungę, **{username}** !")
-    st.write("Čia yra pradinis mūsų puslapis.")
-    st.write("Pasirinkite norimą puslapį šoninėje juostoje.")
-    st.write("Ateityje čia taip pat matysite populiariausias knygas.")
+    if st.session_state.user == 'reader':
+        st.subheader("Pagrindinis")
+        first_name = st.session_state.first_name
+        last_name = st.session_state.last_name
+        st.write(f"Sveiki prisijungę, **{first_name} {last_name}** !")
+        st.write("Čia yra pradinis mūsų puslapis.")
+        st.write("Pasirinkite norimą puslapį šoninėje juostoje.")
+        st.write("Ateityje čia taip pat matysite populiariausias knygas.")
+    if st.session_state.user == 'librarian':
+        st.subheader("Pagrindinis")
+        username = st.session_state.username
+        st.write(f"Sveiki prisijungę, **{username}** !")
+        st.write("Čia yra pradinis mūsų puslapis.")
+        st.write("Pasirinkite norimą puslapį šoninėje juostoje.")
+        st.write("Ateityje čia taip pat matysite populiariausias knygas.")
 
 def show_add_book():
     st.subheader("Pridėti knygą")
@@ -273,7 +285,7 @@ def show_borrow_book():
         book_author = lib.books[book_id].author
         st.write(f'Knyga: {book_name}, Autorius: {book_author}')
         if st.button("Pasiimti"):
-            result = lib.borrow_book(book_id, st.session_state.lib_card)
+            result = lib.borrow_book(book_id, st.session_state.reader_card_number)
             st.write(result)
             save(lib)
     except KeyError:
@@ -282,7 +294,7 @@ def show_borrow_book():
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
     st.write("Jūsų paimtos knygos:")
-    borrowed_books = lib.get_borrowed_by_user(st.session_state.lib_card)
+    borrowed_books = lib.get_borrowed_by_user(st.session_state.reader_card_number)
     if borrowed_books:
         for item in borrowed_books:
             st.write(item)
@@ -296,13 +308,13 @@ def show_borrowed_by_user():
 def show_return_book():
     st.subheader("Grąžinti knygą")
     
-    borrowed_books_dict = lib.get_currently_borrowed_by_user(st.session_state.lib_card) # Returns a list of tuples (book_title, book_id)
+    borrowed_books_dict = lib.get_currently_borrowed_by_user(st.session_state.reader_card_number) # Returns a list of tuples (book_title, book_id)
 
     if borrowed_books_dict:
         book_options = [(title, book_id) for book_id, title in borrowed_books_dict.items()]
         selected_book_title, selected_book_id = st.selectbox("Pasirinkite norimą grąžinti knygą:", book_options, format_func=lambda x: x[0])  # Lambda to only display the title
         if st.button("Grąžinti"):
-                response = lib.return_book(selected_book_id,st.session_state.lib_card)
+                response = lib.return_book(selected_book_id,st.session_state.reader_card_number)
                 st.write(response)
                 save(lib)
     else:
@@ -355,5 +367,5 @@ def show_initialize_data():
         st.write("Duomenys jau inicializuoti")
             
 if __name__ == "__main__":
-    lib = initial_load()
+    lib = Library()
     main(lib)
