@@ -303,17 +303,19 @@ def show_borrow_book():
         
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
-    st.write("Jūsų paimtos knygos:")
-    borrowed_books = lib.get_borrowed_by_user(st.session_state.reader_card_number)
-    if borrowed_books:
-        for item in borrowed_books:
-            st.write(item)
-        #st.subheader("Anksčiau paimtos knygos")
-        #st.write("Anksčiau jūsų paimtos knygos (grąžintos)")
-        #separate currently and previously borrowed books
-
+    if lib.get_reader_overdue(str(st.session_state.reader_id)):
+        st.error("Jūs turite vėluojančių knygų!")
+    st.write("Šiuo metu paimtos knygos:")
+    current_books,previous_books = lib.get_borrowed_by_user(str(st.session_state.reader_id))
+    df1 = pd.DataFrame(current_books, columns=['ID','Paėmimo data',"Pavadinimas","Autorius",'Metai',"Žanras",'ISBN']) # title,author,published_year,genre,isbn
+    df2 = pd.DataFrame(previous_books, columns=['ID','Paėmimo data','Grąžinimo data',"Pavadinimas","Autorius",'Metai',"Žanras",'ISBN'])
+    if current_books:
+        st.table(df1)
     else:
-        st.error("Šiuo metu neturite paėmę knygų")
+        st.success("Šiuo metu neturite paėmę knygų")
+    if previous_books:
+        st.subheader("Grąžintos knygos:")
+        st.table(df2)
 
 def show_return_book():
     st.subheader("Grąžinti knygą")
