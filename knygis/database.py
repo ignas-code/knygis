@@ -226,7 +226,6 @@ def is_book_borrowed_by_reader(book_id,reader_id,db_file):
     result = cursor.fetchall()
     conn.close()
     if len(result) > 0:
-        print("Reader has already borrowed this book")
         return True
     else:
         return False
