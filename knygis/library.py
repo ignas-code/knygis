@@ -51,11 +51,18 @@ class Library:
         return df
 
     def all_readers(self):
-        all_readers = []
-        for value in self.readers.values():
-            all_readers.append(f'{value.lib_card}, {value.username}')
-            print(value.lib_card, value.username)
-        return all_readers
+        """
+        Retrieves all readers from the database.
+
+        Returns:
+            list of tuples
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT * FROM readers''')
+        result = cursor.fetchall()
+        conn.close()
+        return result
 
     def borrow_book(self,book_id,lib_card):
         current_date = dt.now().date().strftime("%Y-%m-%d")
