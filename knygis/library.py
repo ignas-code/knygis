@@ -156,14 +156,26 @@ class Library:
             print(f"Tokios knygos skaitytojas {reader.username} nebuvo paėmęs")
             return f"Tokios knygos skaitytojas **'{reader.username}'** nebuvo paėmęs"
         
-    def add_reader(self,username):
-        self.lib_card_num += 1 # increment the library card ID number
+    def add_reader(self,first_name,last_name): # (id, reader_card_number, first_name, last_name)
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+        INSERT INTO readers (first_name, last_name)
+        VALUES (?,?);
+                        ''',(first_name, last_name))
+        reader_id = cursor.lastrowid
+        lib_card_num = reader_id
         random_num = random.randint(100,999)
-        lib_card = f'BIB{random_num}{self.lib_card_num:04}'
-        books_borrowed = {} # dictionary where key is book ID, and value is borrowing date
-        reader = Reader(username,lib_card,books_borrowed)
-        self.readers[lib_card] = reader
-        return lib_card
+        reader_card_number = f'LIB{random_num}{lib_card_num:04}'
+
+        cursor.execute('''
+        UPDATE readers 
+        SET reader_card_number = ?
+        WHERE id = ?;
+                        ''',(reader_card_number,reader_id))
+        conn.commit()
+        conn.close()
+        return reader_card_number
     
     def find_books_by_name(self,book_name):
         found_books = []

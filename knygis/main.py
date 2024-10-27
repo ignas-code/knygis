@@ -239,15 +239,19 @@ def show_add_reader():
     st.subheader("Pridėti skaitytoją")
     max_chars = settings.max_chars_username
     st.write(f"Sukūrus skaitytoją, skaitytojo kortelės numeris bus sugeneruotas automatiškai. Vartojo vardas neturi viršyti {max_chars} simbolių")
-    input_username = st.text_input("Įveskite vartotojo vardą:")
-    if len(input_username) >= max_chars:
-        st.warning(f"Įvestis apribota iki {max_chars} simbolių.")
-        input_username = input_username[:max_chars]
+    input_first_name = st.text_input("Įveskite skaitytojo vardą:")
+    input_last_name = st.text_input("Įveskite skaitytojo pavardę:")
+    if len(input_first_name) >= max_chars:
+        st.warning(f"Vardo įvestis apribota iki {max_chars} simbolių.")
+        input_first_name = input_first_name[:max_chars]
+
+    if len(input_last_name) >= max_chars:
+        st.warning(f"Pavardės įvestis apribota iki {max_chars} simbolių.")
+        input_last_name = input_last_name[:max_chars]
 
     if st.button("Pridėti"):
-        id = lib.add_reader(input_username)
-        save(lib)
-        st.write(f'Skaitytojas **{input_username}** sukurtas. Skaitytojo kortelės numeris: **{id}**')
+        id = lib.add_reader(input_first_name,input_last_name)
+        st.write(f'Skaitytojas **{input_first_name} {input_last_name}** sukurtas. Skaitytojo kortelės numeris: **{id}**')
 
 def show_all_readers():
     st.subheader("Peržiūrėti skaitytojus")
