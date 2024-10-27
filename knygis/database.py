@@ -231,10 +231,17 @@ def is_book_borrowed_by_reader(book_id,reader_id,db_file):
         return False
 
 def borrow_book(book_id,reader_id,db_file):
+    max_borrowed_books = 3
     reader_overdue_books = get_reader_overdue(reader_id,db_file)
     available_copies_result = available_copies(book_id,db_file)
     currently_borrowed = is_book_borrowed_by_reader(book_id,reader_id,db_file)
-    if reader_overdue_books is None and available_copies_result > 0 and currently_borrowed == False:
+    borrowed_count = get_borrowed_count_by_reader(reader_id,db_file)
+    if (
+        reader_overdue_books is None 
+        and available_copies_result > 0 
+        and currently_borrowed == False 
+        and borrowed_count < max_borrowed_books
+        ):
         conn = sqlite3.connect(db_file)
         cursor = conn.cursor()
         cursor.execute('''
@@ -251,7 +258,8 @@ def borrow_book(book_id,reader_id,db_file):
             print("Cannot borrow book: No available copies")
         if currently_borrowed:
             print("Cannot borrow book: Reader already has this book borrowed")
-        
+        if borrowed_count >= max_borrowed_books:
+            print(f"Cannot borrow book: Reader already has maximum number of books ({max_borrowed_books}) borrowed")
         return False
 
 
