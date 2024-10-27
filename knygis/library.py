@@ -420,19 +420,55 @@ class Library:
                     print(f'Skaitytojas: {late_reader}, knyga: {late_book}')
         return all_overdue, late_readers
     
-    def get_borrowed_by_user(self,lib_card):
-        borrowed_list = []
-        reader = self.readers[lib_card]
-        borrowed_books = reader.view_borrowed()
-        for book_id, dates in borrowed_books.items():
-            borrow_date = dates[0]
-            return_date = dates[1]
-            if return_date == 0:
-                return_date = "-"
-            book_name = self.books[book_id].name
-            book_author = self.books[book_id].author
-            borrowed_list.append(f'ID: {book_id} Knyga: **{book_name}**, autorius: **{book_author}**, paimta: **{borrow_date}**, grąžinta: **{return_date}**')
-        return borrowed_list
+    def get_borrowed_by_user(self,reader_id):
+        """
+        Retrieves all books (title and author) currently and previously borrowed by the reader. Used for borrowed books page.
+        """
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT 
+                            loans.book_id,
+                            loans.loan_date,
+                            books.title,
+                            books.author,
+                            books.published_year,
+                            books.genre,
+                            books.isbn 
+                        FROM 
+                            loans 
+                        INNER JOIN 
+                            books 
+                        ON 
+                            loans.book_id = books.id 
+                        WHERE 
+                            loans.reader_id = ?
+                        AND
+                            return_date IS NULL
+                       ''',(reader_id))
+        current_books = cursor.fetchall()
+        cursor.execute('''SELECT 
+                            loans.book_id,
+                            loans.loan_date,
+                            loans.return_date,
+                            books.title,
+                            books.author,
+                            books.published_year,
+                            books.genre,
+                            books.isbn 
+                        FROM 
+                            loans 
+                        INNER JOIN 
+                            books 
+                        ON 
+                            loans.book_id = books.id 
+                        WHERE 
+                            loans.reader_id = ?
+                        AND
+                            return_date IS NOT NULL
+                       ''',(reader_id))
+        previous_books = cursor.fetchall()
+        conn.close()
+        return current_books, previous_books
 
     def get_currently_borrowed_by_user(self,reader_id):
         """
