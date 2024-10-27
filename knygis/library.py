@@ -41,7 +41,7 @@ class Library:
         """
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
-        cursor.execute('''SELECT id,title,author,published_year,genre,isbn,total_copies FROM books''')
+        cursor.execute('''SELECT id,title,author,published_year,genre,isbn,total_copies FROM books WHERE is_deleted IS 0''')
         result = cursor.fetchall()
         conn.close()
         column_names = ['id', 'Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai']
