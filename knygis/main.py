@@ -183,59 +183,30 @@ def show_all_books():
 
 def show_remove_books():
     st.subheader("Pašalinti knygas")
-    st.write("Knygos, kurių leidimo data senesnė nei nurodyta, bus pašalintos.")
-    st.write("Atkreipkite dėmesį, jog paimtos knygos nebus pašalintos.")
-    criteria = st.number_input("Įveskite metus:", min_value=0000, max_value=2100, step=1, value=1800)
-
-    if 'obsolete_books' not in st.session_state:
-        st.session_state.obsolete_books = None
-    if 'remove_confirmed' not in st.session_state:
-        st.session_state.remove_confirmed = False
-
-    if st.button("Pašalinti"):
-        obsolete = lib.view_obsolete_books(criteria)
-        st.session_state.obsolete_books = obsolete
-        st.session_state.remove_confirmed = False
-        print(f'{obsolete}')
-
-    if st.session_state.obsolete_books:
-        st.write("Ar tikrai norite pašalinti šias knygas?")
-        for book in st.session_state.obsolete_books:
-            st.write(f'{book}')
-
-        if st.session_state.remove_confirmed is False:
-            if st.button("Taip, pašalinti", type="primary") and not st.session_state.remove_confirmed:
-                lib.remove_obsolete_books(criteria)
-                save(lib)
-                st.session_state.remove_confirmed = True
-                st.success("Ištrinta")
-    elif st.session_state.obsolete_books is False:
-        st.error(f"Knygų, kurių leidimo data senesnė nei nurodyta (**{criteria}**m.) nerasta")
-
-    if st.session_state.remove_confirmed:
-        if st.button("Uždaryti"):
-            st.session_state.obsolete_books = None
-            st.session_state.remove_confirmed = False
-
-
-
+    st.error("Funkcija dar kuriama, naudokite tik su administratoriaus leidimu 🔧")
     st.subheader("Pašalinti knygą pagal ID:")
-    book_id = st.number_input("Įveskite norimos knygos ID:",min_value=0,step=1)
-    if book_id is not None and book_id in lib.books:
-        try:
-            st.write(f"{lib.books[book_id]}")
-            if st.button("Pašalinti pagal ID",type="primary", help = "Veiksmas neatšaukiamas"):
-                removed_book = lib.remove_book(book_id)
-                if removed_book.borrowed_cur >= 1:
-                    st.error("Negalima ištrinti! Knyga paimta")
-                else:
-                    st.success("Knyga pašalinta!")
-                    save(lib)
-        except KeyError:
-            st.error("Knyga neegzistuoja")
+    book_id = st.number_input("Įveskite norimos knygos ID:",min_value=1,step=1)
+    book_info = lib.get_book_by_id(book_id)
+    if book_info:
+        st.write(f'{book_info[0][1]}, {book_info[0][2]}')
     else:
         st.error("Knyga neegzistuoja")
-
+    if book_id is not None:
+        try:
+            if st.button("Pašalinti pagal ID",type="primary", help = "Veiksmas neatšaukiamas"):
+                lib.remove_book(book_id)
+        except:
+            st.error("Klaida **'SRB1'**")
+    st.write("")
+    st.write("Visos pašalintos knygos")
+    removed_books = lib.all_removed_books()
+    st.dataframe(removed_books)
+    st.subheader("Grąžinti pašalintą knygą pagal ID:")
+    selected_book = st.selectbox("Pasirinkite pašalintos knygos ID:", removed_books) #, format_func=lambda x: f"{x[1]}, {x[2]}"
+    if st.button("Grąžinti knygą pagal ID",type="primary", help = "Knyga bus grąžinta"):
+        lib.restore_book(selected_book)
+        st.success(f'Knyga {selected_book} grąžinta iš ištrintų')
+        st.rerun()
 
 def show_add_reader():
     st.subheader("Pridėti skaitytoją")
