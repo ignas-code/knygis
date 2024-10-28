@@ -267,8 +267,7 @@ def show_borrow_book():
                 st.error("Jūs jau turite paėmę maksimalų leistiną kiekį knygų!")
     else:
         st.error("Knyga neegzistuoja")
-    # except KeyError:
-    #     st.error("Knyga neegzistuoja (KeyError)")
+
         
 def show_borrowed_by_user():
     st.subheader("Paimtos knygos")
@@ -289,9 +288,9 @@ def show_borrowed_by_user():
 def show_return_book():
     st.subheader("Grąžinti knygą")
     
-    borrowed_books = lib.get_currently_borrowed_by_user(str(st.session_state.reader_id)) # Returns a list of tuples (book_title, book_id)
+    borrowed_books = lib.get_currently_borrowed_by_user(str(st.session_state.reader_id))
     if borrowed_books:
-        selected_book_id, selected_book_title, selected_book_author  = st.selectbox("Pasirinkite norimą grąžinti knygą:", borrowed_books, format_func=lambda x: f"{x[1]}, {x[2]}")  # Lambda to only display the title
+        selected_book_id, selected_book_title, selected_book_author  = st.selectbox("Pasirinkite norimą grąžinti knygą:", borrowed_books, format_func=lambda x: f"{x[1]}, {x[2]}")
         if st.button("Grąžinti"):
                 response = lib.return_book(selected_book_id,st.session_state.reader_id)
                 if response == True:
