@@ -21,7 +21,7 @@ class Library:
 
     def is_book_in_db(self,title,author,published_year,genre,isbn): # does not check for total copies
         """
-        Selects a book entry by its attributes (excluding total_copies) and returns the book_id if it exists.
+        Selects a book entry by its attributes (excluding total_copies) and returns the book_id if it exists and is not deleted.
         Returns:
             tuple: A tuple containing the book_id of the matching entry if found, otherwise None.
         """
@@ -291,7 +291,6 @@ class Library:
 
         return result
 
-
     def find_books_by_author(self,book_author):
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
@@ -301,12 +300,43 @@ class Library:
 
         return result
     
-    def remove_book(self,bookid): #be careful, no safety checks at all
-        try:
-            removed_book = self.books.pop(bookid)
-            return removed_book
-        except KeyError:
-            print(f'Knyga su id {bookid} nerasta')
+    def remove_book(self,book_id): #be careful, no safety checks at all
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+                       UPDATE books
+                       SET is_deleted = 1
+                       WHERE id = ?
+                       ''',(book_id,))
+        conn.commit()
+        conn.close()
+        print(f"Book {book_id} removed")
+        return 
+
+    def restore_book(self,book_id): #be careful, no safety checks at all
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+                       UPDATE books
+                       SET is_deleted = 0
+                       WHERE id = ?
+                       ''',(book_id,))
+        conn.commit()
+        conn.close()
+        print(f"Book {book_id} removed")
+        return 
+
+    def get_book_by_id(self,book_id):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id,title,author FROM books WHERE id = ?''',(book_id,))
+        result = cursor.fetchall()
+        conn.close()
+        if len(result) > 0:
+            return result #f'{result[0][0], result[0][1], result[0][2]}'
+        else:
+            return False
+        
 
     def view_obsolete_books(self,criteria):
         obsolete_books = []
@@ -500,6 +530,18 @@ class Library:
             return title[0],author[0]
         else:
             return False,False
+
+    def all_removed_books(self):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT id,title,author,published_year,genre,isbn,total_copies FROM books WHERE is_deleted IS 1''')
+        result = cursor.fetchall()
+        conn.close()
+        column_names = ['id', 'Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai']
+        df = pd.DataFrame(result, columns=column_names)
+
+        print(df)
+        return df
 
 if __name__ == "__main__":
     # for testing purposes only
