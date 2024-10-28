@@ -17,7 +17,7 @@ class Library:
         self.lib_card_num = 0
         self.librarian = Librarian(settings.librarian_username,settings.librarian_password)
         self.initialized_data = False
-        self.db_file = 'knygis/data/library.db'
+        self.db_file = 'library.db'
 
     def create_database(self):
         conn = sqlite3.connect(self.db_file)
