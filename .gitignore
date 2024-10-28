@@ -166,3 +166,9 @@ cython_debug/
 
 # pickle files
 lib.pickle
+
+# sqlite library
+library.db
+
+# location for wip documentation
+docs/
