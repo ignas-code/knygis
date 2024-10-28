@@ -358,4 +358,5 @@ def show_initialize_data():
             
 if __name__ == "__main__":
     lib = Library()
+    lib.create_database()
     main(lib)
