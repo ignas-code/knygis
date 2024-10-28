@@ -232,7 +232,7 @@ def show_all_readers():
     all_readers = lib.all_readers()
     df = pd.DataFrame(all_readers, columns=["ID","Skait. kortelė",'Vardas',"Pavardė",'Pridėjimo data'])
     if all_readers:
-        st.dataframe(df,use_container_width=True)
+        st.dataframe(df,use_container_width=True,width=800, height=1000)
     else:
         st.write("Skaitytojų nėra")
 
@@ -249,7 +249,6 @@ def show_late_books():
 def show_borrow_book():
     st.subheader("Pasiimti knygą")
     book_id = st.number_input("Įveskite norimos knygos ID:",min_value=1,step=1)
-    # try:
     book_name,book_author = lib.get_title_author(str(book_id))
     if book_name != False and book_author != False:
         st.write(f'Knyga: **{book_name}**, Autorius: **{book_author}**')
@@ -332,24 +331,30 @@ def show_find_books():
 def show_initialize_data():
     st.subheader("Inicializuoti duomenis")
     st.write("Sukelkite iš anksto numatytus duomenis (knygas ir vartotojus)")
-    if lib.initialized_data == False:
-        if st.button("Inicializuoti"):
-            first_reader = lib.add_reader("Ignas Ti")
-            for reader in initial_readers:
-                lib.add_reader(reader)
-            names = initial_books[0]   
-            authors = initial_books[1]
-            years = initial_books[2] 
-            genres = initial_books[3]
-            quantities = initial_books[4]
-            for i in range(len(names)):
-                lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])  
-            lib.borrow_late_book(0,first_reader)
-            st.write("Duomenys inicializuoti")
-            lib.initialized_data = True
-            save(lib)
-    else:
-        st.write("Duomenys jau inicializuoti")
+    st.error("Funkcija kuriama 🔧")
+    # if lib.initialized_data == False:
+    #     if st.button("Inicializuoti"):
+    #         lib.add_reader("Ignas","Code")
+    #         for reader in initial_readers:
+    #             first_name, last_name = reader.split()
+    #             print(first_name,last_name)
+    #             lib.add_reader(first_name,last_name)
+    #         lib.initialized_data = True
+
+
+    #         names = initial_books[0]   
+    #         authors = initial_books[1]
+    #         years = initial_books[2] 
+    #         genres = initial_books[3]
+    #         quantities = initial_books[4]
+    #         for i in range(len(names)):
+    #             lib.add_book(names[i], authors[i], years[i], genres[i], quantities[i])  
+    #         lib.borrow_late_book(0,first_reader)
+    #         st.write("Duomenys inicializuoti")
+        
+    #         save(lib)
+    # else:
+    #     st.write("Duomenys jau inicializuoti")
             
 if __name__ == "__main__":
     lib = Library()
