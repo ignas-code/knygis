@@ -107,21 +107,33 @@ def librarian_navigation(lib):
         show_log_out()
 
 def show_home():
+
+    st.subheader("Pagrindinis")
+    
     if st.session_state.user == 'reader':
-        st.subheader("Pagrindinis")
         first_name = st.session_state.first_name
         last_name = st.session_state.last_name
-        st.write(f"Sveiki prisijungę, **{first_name} {last_name}** !")
-        st.write("Čia yra pradinis mūsų puslapis.")
-        st.write("Pasirinkite norimą puslapį šoninėje juostoje.")
-        st.write("Ateityje čia taip pat matysite populiariausias knygas.")
+        st.success(f"Sveiki prisijungę, **{first_name} {last_name}** !")
     if st.session_state.user == 'librarian':
-        st.subheader("Pagrindinis")
         username = st.session_state.username
-        st.write(f"Sveiki prisijungę, **{username}** !")
-        st.write("Čia yra pradinis mūsų puslapis.")
-        st.write("Pasirinkite norimą puslapį šoninėje juostoje.")
-        st.write("Ateityje čia taip pat matysite populiariausias knygas.")
+        st.success(f"Sveiki prisijungę, **{username}** !")
+    #st.image("knygis/data/knygis_logo.jpg")
+    st.write("Čia yra pradinis mūsų puslapis. Norėdami tęsti, pasirinkite norimą skiltį iš šoninės juostos.")
+    
+    st.divider()
+    #st.write("Ateityje čia taip pat matysite populiariausias knygas.")
+    col1, col2, col3 = st.columns(3)
+    total_books = lib.count_all_books()
+    total_readers = lib.count_all_readers()
+    borrowed_books = lib.get_all_borrowed_count()
+    col1.metric("Viso knygų", total_books) #, "1 %"
+    col2.metric("Viso skaitytojų", total_readers) #, "8%"
+    col3.metric("Šiuo metu paimtų knygų", borrowed_books) #, "4%"
+
+    top_5_books = lib.top_5_books()
+    st.divider()
+    st.write("TOP 5 knygos:")
+    st.dataframe(top_5_books, use_container_width=True, hide_index=True,column_order=('Paimta kartų','Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai'))
 
 def show_add_book():
     st.subheader("Pridėti knygą")
