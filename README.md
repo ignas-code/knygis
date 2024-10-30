@@ -1,5 +1,7 @@
 # KNYGIS
 
+<img src="knygis/data/knygis_logo.jpg" alt="Knygis" width="800"/>
+
 **Kny**gyno **I**nformacinė **S**istema - paprasta bibliotekos valdymo programa
 
 
@@ -8,6 +10,7 @@
 - [Įžanga](#įžanga)
 - [Paleidimas](#paleidimas)
 - [Funkcijos](#funkcijos)
+- [Pakeitimai](#changelog)
 
 ## Įžanga
 
@@ -45,3 +48,7 @@ Programoje yra prisijungimo langas, kuriame vartotojai gali pasirinkti:
 - *Peržiūrėti vėluojančias knygas*: Matyti, kurios knygos vėluoja, ir kurie vartotojai turi vėluojančių knygų.
 - *Inicializuoti duomenis*: Galimybė įkelti iš anksto numatytus duomenis, jei tai dar nebuvo atlikta.
 - *Atsijungti*: Baigti sesiją.
+
+## Pakeitimai
+
+Detalus pakeitimų sąrašas (EN) [Changelog](CHANGELOG.md).
