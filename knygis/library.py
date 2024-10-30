@@ -154,6 +154,31 @@ class Library:
         print(df)
         return df
 
+    def count_all_books(self):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT COUNT(*) FROM books WHERE is_deleted IS 0''')
+        result = cursor.fetchall()
+        conn.close()
+        return result[0][0]
+
+    def top_5_books(self):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''
+                        SELECT books.title, books.author, books.published_year, books.genre, books.isbn, books.total_copies, 
+                            (SELECT COUNT(*) FROM loans WHERE loans.book_id = books.id) AS loan_count
+                        FROM books
+                        WHERE books.is_deleted = 0
+                        ORDER BY loan_count DESC
+                        LIMIT 5;
+                        ''')
+        result = cursor.fetchall()
+        conn.close()
+        column_names = ['Pavadinimas', 'Autorius', 'Leidimo metai', 'Žanras', 'ISBN', 'Vienetai', 'Paimta kartų']
+        df = pd.DataFrame(result, columns=column_names)
+        return df
+
     def all_readers(self):
         """
         Retrieves all readers from the database.
@@ -168,6 +193,14 @@ class Library:
         conn.close()
         return result
 
+    def count_all_readers(self):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT COUNT(*) FROM readers''')
+        result = cursor.fetchall()
+        conn.close()
+        return result[0][0]
+
     def available_copies(self,book_id):
         """
         Returns:
@@ -178,9 +211,9 @@ class Library:
         """
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
-        cursor.execute('''SELECT total_copies FROM books WHERE id = ?''',(book_id))
+        cursor.execute('''SELECT total_copies FROM books WHERE id = ?''',(book_id,))
         total_copies = cursor.fetchone()
-        cursor.execute('''SELECT COUNT(*) FROM loans WHERE book_id = ? AND return_date IS NULL''',(book_id))
+        cursor.execute('''SELECT COUNT(*) FROM loans WHERE book_id = ? AND return_date IS NULL''',(book_id,))
         loaned_copies = cursor.fetchone()
         conn.close()
         if total_copies != None and loaned_copies is not None:
@@ -217,8 +250,15 @@ class Library:
         conn.close()
         return result[0]
 
+    def get_all_borrowed_count(self):
+        conn = sqlite3.connect(self.db_file)
+        cursor = conn.cursor()
+        cursor.execute('''SELECT COUNT(*) FROM loans WHERE return_date IS NULL''')
+        result = cursor.fetchone()
+        conn.close()
+        return result[0]
+
     def borrow_book(self,book_id,reader_id):
-        print('function sstart')
         max_borrowed_books = 3
         reader_overdue_books = self.get_reader_overdue(reader_id)
         available_copies_result = self.available_copies(book_id)
@@ -388,7 +428,6 @@ class Library:
         else:
             return False
         
-
     def view_obsolete_books(self,criteria):
         obsolete_books = []
         for book_id in self.books:
@@ -498,7 +537,7 @@ class Library:
                             loans.reader_id = ?
                         AND
                             return_date IS NULL
-                       ''',(reader_id))
+                       ''',(reader_id,))
         current_books = cursor.fetchall()
         cursor.execute('''SELECT 
                             loans.book_id,
@@ -519,7 +558,7 @@ class Library:
                             loans.reader_id = ?
                         AND
                             return_date IS NOT NULL
-                       ''',(reader_id))
+                       ''',(reader_id,))
         previous_books = cursor.fetchall()
         conn.close()
         return current_books, previous_books
@@ -533,11 +572,11 @@ class Library:
         """
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
-        cursor.execute('''SELECT book_id FROM loans WHERE reader_id = ? AND return_date IS NULL''',(reader_id))
+        cursor.execute('''SELECT book_id FROM loans WHERE reader_id = ? AND return_date IS NULL''',(reader_id,))
         book_ids = cursor.fetchall()
         book_titles_authors = []
         for book_id in book_ids:
-            cursor.execute('''SELECT id, title, author FROM books WHERE id = ?''',(str(book_id[0])))
+            cursor.execute('''SELECT id, title, author FROM books WHERE id = ?''',(str(book_id[0]),))
             result = cursor.fetchone()
             book_titles_authors.append(result)
         conn.close()
@@ -572,9 +611,9 @@ class Library:
     def get_title_author(self,book_id):
         conn = sqlite3.connect(self.db_file)
         cursor = conn.cursor()
-        cursor.execute('''SELECT title FROM books WHERE id = ?''',(book_id))
+        cursor.execute('''SELECT title FROM books WHERE id = ?''',(book_id,))
         title = cursor.fetchone()
-        cursor.execute('''SELECT author FROM books WHERE id = ?''',(book_id))
+        cursor.execute('''SELECT author FROM books WHERE id = ?''',(book_id,))
         author = cursor.fetchone()
         conn.close()
         if title is not None and author is not None:
@@ -593,25 +632,3 @@ class Library:
 
         print(df)
         return df
-
-if __name__ == "__main__":
-    # for testing purposes only
-    lib = Library()
-    for i in range(9):
-        lib.add_book("Lustu karas","Chris Miller",2024,"publicistika",2)
-    lib.add_book("Atominiai iprociai","Hanes Clear",2019,"dalykine",-1)
-    lib.add_book("Atominiai iprociai","Hanes Clear",2019,"dalykine",10)
-    lib.add_book("Fear no evil","Natan",1988,"zanras",2)
-    lib._remove_book(4)
-    lib.all_books()
-    for i in range (3):
-        lib.add_reader("Jonas Jonauskas")
-    lib.add_reader("Tomas")
-    lib.find_books_by_name("ato")
-    lib.all_readers()
-    reader1 = lib.readers["BIB00001"]
-    reader1_borrowed = reader1.books_borrowed
-    lib.borrow_book(1,"BIB00001")
-    lib.borrow_book(2,"BIB00001")
-    lib.get_all_overdue()
-    print(lib.all_books())
