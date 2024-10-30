@@ -418,6 +418,16 @@ files = [
 ]
 
 [[package]]
+name = "mysql-connector"
+version = "2.2.9"
+description = "MySQL driver written in Python"
+optional = false
+python-versions = "*"
+files = [
+    {file = "mysql-connector-2.2.9.tar.gz", hash = "sha256:1733e6ce52a049243de3264f1fbc22a852cb35458c4ad739ba88189285efdf32"},
+]
+
+[[package]]
 name = "narwhals"
 version = "1.9.3"
 description = "Extremely lightweight compatibility layer between dataframe libraries"
@@ -1170,4 +1180,4 @@ watchmedo = ["PyYAML (>=3.10)"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.12"
-content-hash = "350a8b573c35e0bb06705552fca5f3d468fcd0de9c23a4b3cb9c0aa65c664973"
+content-hash = "4f4e0013f7dccdf618dab4371141b25b8293f0e8a5e98f8f87ed85761251f2c2"
